@@ -32,6 +32,7 @@
 Corners cut:
 - Using NextJS as quickest way for me to get an API running. Likely not best tool for the job - ideally would research options, look at skillset of team to decide best choice.
 - Using currently installed Node @23.7. Will update if required. Should be using LTS
+- Struggling to get `tsconfig.json` `"baseUrl"` to work for tidy import statements. Not important enough to warrant further investigation RN
 
 ### Update Node
 
@@ -89,9 +90,9 @@ Lol. Current Jest needs >=24
   $ yarn remove jest jest-environment-jsdom @testing-library/jest-dom @types/jest
   $ rm jest.config
   ```
-- Add vitest
+- Add vitest with react-plugin and browser-playwright package
   ```
-  $ yarn add -D vitest
+  $ yarn add -D vitest @vitejs/plugin-react @vitest/browser-playwright
   ```
 - Update test commands in `./package.json` `scripts`:
   ```
@@ -99,9 +100,69 @@ Lol. Current Jest needs >=24
     ...,
     "scripts": {
       ...,
-      "test": "vitest",
-      "test:watch": "vitest --watch"
+      "test:node": "vitest __tests__/api/ __tests__/utils/  --browser=false",
+      "test:browser": "vitest __tests__/components/ __tests__/pages/"
     },
     ...
   }
+  ```
+- Add vitest browser support:
+  ```
+  $ yarn exec vitest init browser
+  > Typescript
+  > playwright
+  > chromium
+  > react
+  > y
+  ```
+- Update `/vitest.config.ts`
+  ```
+  [...]
+  test: {
+    globals: true,
+    browser: {
+      [...]
+      instances: [{ browser: 'chromium' as const }]
+    },
+    [...]
+  }
+  [...]
+  ```
+- Add playwright
+  ```
+  $ yarn add -D playwright
+  $ yarn playwright install
+  ```
+  N.B. If there are issues downloading Chromium from the playwrght CDN, run `$ yarn test` and note the error, e.g.
+  ```
+  Error: browserType.launch: Executable doesn't exist at /Users/{username}/Library/Caches/ms-playwright/chromium-1223/chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing
+  ```
+
+  Note the full path shown - yours may vary!
+
+  (instructions for Mac OS based on https://github.com/microsoft/playwright/issues/28329#issuecomment-1825934342)
+    - In `terminal` run ` $ brew install chromium`
+    -
+      ```
+      $ mkdir /Users/{username}/Library/Caches/ms-playwright/chromium-1223/chrome-mac-x64/Google\ Chrome\ for\ Testing.app
+      ```
+    -
+      ```
+      $ cp -r /Applications/Chromium.app /Users/{username}/Library/Caches/ms-playwright/chromium-1223/chrome-mac-x64/Google\ Chrome\ for\ Testing.app
+      ```
+
+- Update `/tsconfig.json`
+  ```
+  {
+    [...],
+    "compilerOptions": {
+      [...],
+      "types": ["vitest/globals"]
+    }
+    [...],
+  }
+  ```
+- Remove vitest sample code
+  ```
+  $ rm -rfv vitest-example
   ```
