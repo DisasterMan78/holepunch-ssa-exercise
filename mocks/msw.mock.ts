@@ -6,6 +6,7 @@ import { setupServer } from "msw/node";
 export const testShedulingAPIURL = 'http://localhost:3000/api/scheduling'
 
 export const testAPIResponse = {
+  unbuiltAPI: true,
 }
 
 export const server = setupServer(
