@@ -7,7 +7,7 @@ import { server, testShedulingAPIURL, testAPIResponse } from '../../mocks/msw.mo
 
 describe('api fetch tests', () => {
   it('receives data from API on success', async () => {
-    const result = await FetchApiOnClient(testShedulingAPIURL, {})
+    const result = await FetchApiOnClient(testShedulingAPIURL, 'POST', {})
 
     expect(result).toEqual(testAPIResponse)
   })
@@ -19,7 +19,7 @@ describe('api fetch tests', () => {
       }),
     )
 
-    await FetchApiOnClient(testShedulingAPIURL, {})
+    await FetchApiOnClient(testShedulingAPIURL, 'POST', {})
       .catch(error => {
         expect(error.message).toEqual('Failed to fetch data: 500 - Internal Server Error')
       })

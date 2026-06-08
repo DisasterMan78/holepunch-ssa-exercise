@@ -1,15 +1,30 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const FetchApiOnClient = async (apiURL: string, payload: {[key: string]: any}) => {
+type Methods = 'POST' | 'GET';
+
+type FetchInit = {
+  method: Methods;
+  headers: {
+    Accept: string;
+    'Content-Type': string;
+  };
+  body?: string;
+}
+
+export const FetchApiOnClient = async (apiURL: string, method: Methods, payload?: { [key: string]: any }) => {
   let responseData;
+  const fetchInit:FetchInit = {
+    method,
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+  }
+
+  if (method === 'POST') {
+    fetchInit.body = JSON.stringify(payload);
+  }
+
   try {
-    const response = await fetch(apiURL, {
-      method:'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload),
-    });
+    const response = await fetch(apiURL, fetchInit);
 
     if (response.status !== 200) {
       throw new Error(`Failed to fetch data: ${response.status} - ${response.statusText}`);
