@@ -108,6 +108,10 @@ a.secondary {
   flex-shrink: 0;
 }
 
+.idInput {
+  width: 25px;
+}
+
 .reponseTextarea {
   width: 400px;
   height: 275px;

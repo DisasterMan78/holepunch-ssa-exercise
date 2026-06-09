@@ -4,12 +4,16 @@ export type SchedulingFormProps = {
   onSubmitFn: (event: SubmitEvent<HTMLFormElement>) => void,
 };
 
+import styles from '../page.module.css';
+
 
 const SchedulingForm = ({ onSubmitFn }: SchedulingFormProps) => {
   const [showSingleOption, setShowSingleOption] = useState(false);
   const [showListOptions, setShowListOptions] = useState(false);
   const [reservationId, setReservationId] = useState('1');
   const [resourceId, setResourceId] = useState('');
+  const [paginationSize, setPaginationSize] = useState('');
+  const [page, setPage] = useState('');
 
   const resetOptions = () => {
     setShowSingleOption(false);
@@ -18,8 +22,9 @@ const SchedulingForm = ({ onSubmitFn }: SchedulingFormProps) => {
 
   const showFieldOptions = (event: ChangeEvent<HTMLInputElement>) => {
     const selected = event.target.value;
-    console.log("🚀 ~ showFieldOptions ~ selected:", selected)
+
     resetOptions();
+
     switch (selected) {
       case 'reservation':
         setShowSingleOption(true);
@@ -72,6 +77,7 @@ const SchedulingForm = ({ onSubmitFn }: SchedulingFormProps) => {
             placeholder="id"
             name="reservationId"
             value={reservationId}
+            className={styles.idInput}
             onChange={(e) => setReservationId(e.target.value)}
           />
         </>
@@ -87,7 +93,36 @@ const SchedulingForm = ({ onSubmitFn }: SchedulingFormProps) => {
             placeholder="id"
             name="resourceId"
             value={resourceId}
+            className={styles.idInput}
             onChange={(e) => setResourceId(e.target.value)}
+          />
+          <br />
+          <label htmlFor="paginationSize">
+            Pagination size
+          </label>
+          <br />
+          <input
+            type="number"
+            placeholder="#"
+            name="paginationSize"
+            min="1"
+            value={paginationSize}
+            className={styles.idInput}
+            onChange={(e) => setPaginationSize(e.target.value)}
+          />
+          <br />
+          <label htmlFor="page">
+            Page #
+          </label>
+          <br />
+          <input
+            type="number"
+            placeholder="#"
+            name="page"
+            min="1"
+            value={page}
+            className={styles.idInput}
+            onChange={(e) => setPage(e.target.value)}
           />
         </>
       )}

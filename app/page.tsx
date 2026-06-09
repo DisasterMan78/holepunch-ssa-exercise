@@ -11,6 +11,8 @@ import { HydratedReservationData } from './api/scheduling/handlers';
 type RequestOptions = {
   reservationId?: number,
   resourceId?: number,
+  paginationSize?: number,
+  page?: number,
 }
 
 const Home = () => {
@@ -41,6 +43,8 @@ const Home = () => {
         delete requestOptions.reservationId;
         apiUrl = endpoints.list;
         requestOptions.resourceId = form.resourceId.value;
+        requestOptions.paginationSize = form.paginationSize.value;
+        requestOptions.page = form.page.value - 1;
       break;
     }
 
@@ -48,7 +52,6 @@ const Home = () => {
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       ...requestOptions
     };
-    console.log("🚀 ~ onSubmitFn ~ payload:", payload)
 
     FetchApiOnClient(apiUrl, 'POST', payload)
       .catch(error => {
