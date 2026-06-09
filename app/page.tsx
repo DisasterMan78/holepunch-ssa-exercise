@@ -10,6 +10,7 @@ import { HydratedReservationData } from './api/scheduling/handlers';
 
 type RequestOptions = {
   reservationId?: number,
+  resourceId?: number,
 }
 
 const Home = () => {
@@ -29,11 +30,8 @@ const Home = () => {
 
     const form = event.target
 
-    const requestType = form['api-request-type'].value;
-    console.log("🚀 ~ onSubmitFn ~ requestType:", requestType)
-    const requestOptions: RequestOptions = {
-      reservationId: 1,
-    };
+    const requestType = form.apiRequestType.value;
+    const requestOptions: RequestOptions = {};
 
     switch (requestType) {
       case 'reservation':
@@ -42,6 +40,7 @@ const Home = () => {
       case 'list':
         delete requestOptions.reservationId;
         apiUrl = endpoints.list;
+        requestOptions.resourceId = form.resourceId.value;
       break;
     }
 

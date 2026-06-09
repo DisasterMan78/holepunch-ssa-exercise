@@ -8,9 +8,12 @@ export type SchedulingFormProps = {
 const SchedulingForm = ({ onSubmitFn }: SchedulingFormProps) => {
   const [showSingleOption, setShowSingleOption] = useState(false);
   const [showListOptions, setShowListOptions] = useState(false);
+  const [reservationId, setReservationId] = useState('1');
+  const [resourceId, setResourceId] = useState('');
 
   const resetOptions = () => {
     setShowSingleOption(false);
+    setShowListOptions(false)
   }
 
   const showFieldOptions = (event: ChangeEvent<HTMLInputElement>) => {
@@ -39,18 +42,18 @@ const SchedulingForm = ({ onSubmitFn }: SchedulingFormProps) => {
         <label htmlFor="api-request-reservation">
           <input
             type="radio"
-            name="api-request-type"
+            name="apiRequestType"
             id="api-request-reservation"
             value="reservation"
             onChange={(e) => showFieldOptions(e)}
           />
           Single Reservation
         </label>
-        <label htmlFor="api-request-list">
+        <label htmlFor="apiRequestList">
           <input
             type="radio"
-            name="api-request-type"
-            id="api-request-list"
+            name="apiRequestType"
+            id="apiRequestList"
             value="list"
             onChange={(e) => showFieldOptions(e)}
           />
@@ -59,13 +62,34 @@ const SchedulingForm = ({ onSubmitFn }: SchedulingFormProps) => {
       </fieldset>
       <br />
       {showSingleOption && (
-        <label htmlFor="reservationId">
+        <>
+          <label htmlFor="reservationId">
+            Reservation ID
+          </label>
+          <br />
           <input
             type="number"
             placeholder="id"
             name="reservationId"
+            value={reservationId}
+            onChange={(e) => setReservationId(e.target.value)}
           />
-        </label>
+        </>
+      )}
+      {showListOptions && (
+        <>
+          <label htmlFor="resourceId">
+            Resource ID
+          </label>
+          <br />
+          <input
+            type="number"
+            placeholder="id"
+            name="resourceId"
+            value={resourceId}
+            onChange={(e) => setResourceId(e.target.value)}
+          />
+        </>
       )}
       <br />
       <button>Submit POST request to Scheduling API</button>
