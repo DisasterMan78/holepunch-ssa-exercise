@@ -27,7 +27,10 @@ export const FetchApiOnClient = async (apiURL: string, method: Methods, payload?
     const response = await fetch(apiURL, fetchInit);
 
     if (response.status !== 200) {
-      throw new Error(`Failed to fetch data: ${response.status} - ${response.statusText}`);
+      return {
+        error: response.status,
+        errorMessage: response.statusText,
+      }
     }
 
     responseData = await response.json();

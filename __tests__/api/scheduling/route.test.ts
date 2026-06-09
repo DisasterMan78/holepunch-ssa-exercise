@@ -24,8 +24,52 @@ describe('POST - scheduling-api', () => {
     expect(json).toBeTruthy()
   })
 
-  it('should read a single reservation in hydrated form - POST {reservationId=}', async () => {
-    const reservationId = 1
+
+  it('should return 400 if the JSON is not present', async () => {
+    const request = new NextRequest(new Request(testShedulingAPIURL, {
+      method: 'POST',
+    }))
+    const response = await POST(request)
+    const contentType = response.headers.get('Content-Type')
+    const json = await response.json();
+
+    expect(response.status).toEqual(400)
+    expect(contentType).toEqual('application/json')
+    expect(json.error).toEqual('Invalid request body - request body not present or empty')
+  })
+
+
+  it('should return 400 if the payload is not present', async () => {
+    const request = new NextRequest(new Request(testShedulingAPIURL, {
+      method: 'POST',
+      body: JSON.stringify({})
+    }))
+    const response = await POST(request)
+    const contentType = response.headers.get('Content-Type')
+    const json = await response.json();
+
+    expect(response.status).toEqual(400)
+    expect(contentType).toEqual('application/json')
+    expect(json.error).toEqual('Invalid request body - payload contains no data')
+  })
+
+  it('returns 500 if the reservation API has an internal error', async () => {
+    const request = new NextRequest(new Request(testShedulingAPIURL, {
+      method: 'POST',
+      body: JSON.stringify({
+        reservationId: 7,
+        timezone: 'Europe/Istanbul'})
+    }))
+    const response = await POST(request)
+    const contentType = response.headers.get('Content-Type')
+    const json = await response.json();
+
+    expect(response.status).toEqual(500)
+    expect(contentType).toEqual('application/json')
+    expect(json.error).toEqual('Upstream error: Internal Server Error')
+  })
+
+  it('should read a single reservation in hydrated form and provide correctly adjusted local start and end times - POST {reservationId=}', async () => {
     const request = new NextRequest(new Request(`${testShedulingAPIURL}`, {
       method: 'POST',
       body: JSON.stringify({
@@ -52,8 +96,8 @@ describe('POST - scheduling-api', () => {
         capacity: 8,
         timezone: 'Europe/Lisbon'
       },
-      "localEndsAt": "2026-01-06T11:00:00.000Z",
-      "localStartsAt": "2026-01-06T10:00:00.000Z",
+      localStartsAt: "2026-01-06T12:00:00.000Z",
+      localEndsAt: "2026-01-06T13:00:00.000Z",
       durationMinutes: 60
     })
   })

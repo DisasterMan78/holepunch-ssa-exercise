@@ -47,23 +47,50 @@ const intlDateTimeOptions:Intl.DateTimeFormatOptions = {
 
 export const POST = async (request: NextRequest) => {
 
-  const payload:ReservationRequest = await request.json();
 
-  let reservationData: ReservationData;
-  let hydratedReservationData: HydratedReservationData;
+  if(!request.body || (request.body.constructor === Object && Object.keys(request.body).length === 0)) {
+    return new Response(JSON.stringify({ error: 'Invalid request body - request body not present or empty'}), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
 
-  if (!payload) {
-    return new Response(JSON.stringify({ error: 'Invalid request body'}), {
+  const payload: ReservationRequest = await request.json();
+
+  if (!payload || Object.keys(payload).length === 0) {
+    return new Response(JSON.stringify({ error: 'Invalid request body - payload contains no data'}), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
   }
 
   if (!payload.reservationId) {
+    return new Response(JSON.stringify({ error: 'Invalid request body - no reservationId received'}), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
+
+  if (!payload.timezone) {
+    return new Response(JSON.stringify({ error: 'Invalid request body - no timezone identifier received'}), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  let reservationData: ReservationData;
+  let hydratedReservationData: HydratedReservationData;
+
   const reservationIdURL = `${reservationsAPIURL}${payload.reservationId}`;
 
   const response = await FetchApiOnClient(reservationIdURL, 'GET');
+
+  if (response.error) {
+    return new Response(JSON.stringify({ error: `Upstream error: ${response.errorMessage}`}), {
+      status: response.error,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
 
   reservationData = {
     id: response.id,
@@ -75,16 +102,24 @@ export const POST = async (request: NextRequest) => {
 
   if (reservationData.resourceId) {
     const resourceIdURL = `${catalogAPIURL}${reservationData.resourceId}`;
-    const response = await FetchApiOnClient(resourceIdURL, 'GET');
-    const resourceData:ResourceData = {
-      id: response.id,
-      name: response.name,
-      kind: response.kind,
-      capacity: response.capacity,
-      timezone: response.timezone,
+    const resourceResponse = await FetchApiOnClient(resourceIdURL, 'GET', null);
+
+    if (Object.keys(resourceResponse).length === 0) {
+      return new Response(JSON.stringify({ error: `Server error - no resource with id ${reservationData.resourceId}`}), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
-    intlDateTimeOptions.timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const resourceData:ResourceData = {
+      id: resourceResponse.id,
+      name: resourceResponse.name,
+      kind: resourceResponse.kind,
+      capacity: resourceResponse.capacity,
+      timezone: resourceResponse.timezone,
+    }
+
+    intlDateTimeOptions.timeZone = payload.timezone;
     const formatter = new Intl.DateTimeFormat('en-GB', intlDateTimeOptions)
 
     const startDate = new Date(reservationData.startsAt)
@@ -105,7 +140,6 @@ export const POST = async (request: NextRequest) => {
       localEndsAt,
       durationMinutes,
     }
-    console.log("🚀 ~ POST ~ hydratedReservationData:", hydratedReservationData)
   }
 
   return new Response(JSON.stringify({
