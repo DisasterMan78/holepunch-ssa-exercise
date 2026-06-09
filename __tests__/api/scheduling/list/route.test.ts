@@ -136,4 +136,56 @@ describe('POST - scheduling-api', () => {
       },
     })
   })
+
+  it('should list all reservations filtered by resourceId - POST /list/{id}', async () => {
+    const request = new NextRequest(new Request(testSchedulingListAPIURL, {
+      method: 'POST',
+      body: JSON.stringify({
+        resourceId: 1,
+        timezone: 'Europe/Istanbul'
+      })
+    }))
+    const response = await POST(request)
+    const contentType = response.headers.get('Content-Type')
+    const json = await response.json();
+
+    expect(response.status).toEqual(200)
+    expect(contentType).toEqual('application/json')
+    expect(json).toEqual({
+      0: {
+        durationMinutes: 60,
+        endsAt: "2026-06-01T10:00:00Z",
+        holder: "alice@example.com",
+        id: 1,
+        localEndsAt: "2026-01-06T13:00:00.000Z",
+        localStartsAt: "2026-01-06T12:00:00.000Z",
+        resource: {
+          capacity: 8,
+          id: 1,
+          kind: "room",
+          name: "Conference Room A",
+          timezone: "Europe/Lisbon",
+        },
+        resourceId: 1,
+        startsAt: "2026-06-01T09:00:00Z",
+      },
+      1: {
+        durationMinutes: 60,
+        endsAt: "2026-06-01T12:00:00Z",
+        holder: "bob@example.com",
+        id: 2,
+        localEndsAt: "2026-01-06T15:00:00.000Z",
+        localStartsAt: "2026-01-06T14:00:00.000Z",
+        resource: {
+          capacity: 8,
+          id: 1,
+          kind: "room",
+          name: "Conference Room A",
+          timezone: "Europe/Lisbon",
+        },
+        resourceId: 1,
+        startsAt: "2026-06-01T11:00:00Z",
+      },
+    })
+  })
 })
