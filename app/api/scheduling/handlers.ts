@@ -117,6 +117,16 @@ export const getReservationsList = async (payload) => {
     hydratedReservationsData.push(hydratedItem);
   };
 
+  if (payload.paginationSize) {
+    if (!payload.page) {
+      payload.page = 0;
+    }
+    const startIndex = payload.page * payload.paginationSize;
+    const endIndex = startIndex + payload.paginationSize;
+
+    hydratedReservationsData = hydratedReservationsData.slice(startIndex, endIndex)
+  }
+
   return new Response(JSON.stringify({
     ...hydratedReservationsData,
   }), {
