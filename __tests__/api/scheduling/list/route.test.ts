@@ -241,4 +241,93 @@ describe('POST - scheduling-api', () => {
       },
     })
   })
+
+  it('should list all reservations with paginated results - second page - POST /scheduling/list/', async () => {
+    const request = new NextRequest(new Request(testSchedulingListAPIURL, {
+      method: 'POST',
+      body: JSON.stringify({
+        timezone: 'Europe/Istanbul',
+        paginationSize: 2,
+        page: 1,
+      })
+    }))
+    const response = await POST(request)
+    const contentType = response.headers.get('Content-Type')
+    const json = await response.json();
+
+    expect(response.status).toEqual(200)
+    expect(contentType).toEqual('application/json')
+    expect(json).toEqual({
+      0: {
+        durationMinutes: 120,
+        endsAt: "2026-06-02T16:00:00Z",
+        holder: "carol@example.com",
+        id: 3,
+        localEndsAt: "2026-02-06T19:00:00.000Z",
+        localStartsAt: "2026-02-06T17:00:00.000Z",
+        resource: {
+          capacity: 1,
+          id: 2,
+          kind: "gpu",
+          name: "GPU Workstation 1",
+          timezone: "UTC",
+        },
+        resourceId: 2,
+        startsAt: "2026-06-02T14:00:00Z",
+      },
+      1: {
+        durationMinutes: 540,
+        endsAt: "2026-06-03T17:00:00Z",
+        holder: "dave@example.com",
+        id: 4,
+        localEndsAt: "2026-03-06T20:00:00.000Z",
+        localStartsAt: "2026-03-06T11:00:00.000Z",
+        resource: {
+          capacity: 9,
+          id: 3,
+          kind: "vehicle",
+          name: "Van #4",
+          timezone: "America/New_York",
+        },
+        resourceId: 3,
+        startsAt: "2026-06-03T08:00:00Z",
+      },
+    })
+  })
+
+  it('should list all reservations with paginated results - last page - POST /scheduling/list/', async () => {
+    const request = new NextRequest(new Request(testSchedulingListAPIURL, {
+      method: 'POST',
+      body: JSON.stringify({
+        timezone: 'Europe/Istanbul',
+        paginationSize: 2,
+        page: 2,
+      })
+    }))
+    const response = await POST(request)
+    const contentType = response.headers.get('Content-Type')
+    const json = await response.json();
+
+    expect(response.status).toEqual(200)
+    expect(contentType).toEqual('application/json')
+    expect(json).toEqual({
+      0: {
+        durationMinutes: 60,
+        endsAt: "2026-06-04T14:00:00Z",
+        holder: "erin@example.com",
+        id: 5,
+        localEndsAt: "2026-04-06T16:00:00.000Z",
+        localStartsAt: "2026-04-06T15:00:00.000Z",
+        resource: {
+          capacity: 12,
+          id: 5,
+          kind: "room",
+          name: "Conference Room B",
+          timezone: "Europe/Lisbon",
+        },
+        resourceId: 5,
+        startsAt: "2026-06-04T13:00:00Z",
+      },
+    })
+  })
 })
