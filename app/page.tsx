@@ -1,44 +1,44 @@
 'use client';
-import { FormEvent, useState } from 'react';
+import { SubmitEvent, useState } from 'react';
 
 import { FetchApiOnClient } from './utils/fetch-api';
 import SchedulingForm, { SchedulingFormProps } from './components/scheduling-form';
-import {default as ErrorUI} from './error';
+import {ApiError, default as ErrorUI} from './error';
+import { HydratedReservationData } from './api/scheduling/route';
 
 import styles from './page.module.css';
 
-type Response = {
-  unbuiltAPI: boolean;
-};
-
 const Home = () => {
-  const [error, setError] = useState<null | Error>(null);
+  const [error, setError] = useState<null | ApiError>(null);
   const [dataIsLoading, setDataIsLoading] = useState(false);
-  const [response, setResponse] = useState<Response | undefined>(undefined);
+  const [response, setResponse] = useState<HydratedReservationData | undefined>(undefined);
 
-  const onRevenueSubmitFn = (e: FormEvent<HTMLFormElement>) => {
+  const onRevenueSubmitFn = (e: SubmitEvent<HTMLFormElement>) => {
     setDataIsLoading(true);
     setResponse(undefined);
     setError(null);
 
-    const formElement = e.currentTarget;
     const payload = {
-      dummy: true,
+      reservationId: 1,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
     };
 
-    FetchApiOnClient('http://localhost:3000/api/scheduling', payload)
+    FetchApiOnClient('http://localhost:3000/api/scheduling', 'POST', payload)
       .catch(error => {
-        setError(error as Error);
+        setError(error as ApiError);
       })
-      .then((response: Response) => {
-        console.log(response)
-        setResponse(response)
+      .then((response: HydratedReservationData | ApiError) => {
+        if ('error' in response) {
+          setError(response as ApiError);
+        } else {
+          setResponse(response as HydratedReservationData);
+        }
         setDataIsLoading(false);
       });
   };
 
   const schedulingFormProps: SchedulingFormProps = {
-    onSubmitFn: onRevenueSubmitFn
+    onSubmitFn: onRevenueSubmitFn,
   }
 
   return (
@@ -51,6 +51,10 @@ const Home = () => {
           <ErrorUI error={error} reset={() => { }} />
           )
         }
+        <textarea
+          className={styles.reponseTextarea}
+          value={JSON.stringify(response, null, 2)}
+        />
       </main>
     </div>
   );

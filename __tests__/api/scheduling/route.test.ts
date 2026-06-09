@@ -35,7 +35,7 @@ describe('POST - scheduling-api', () => {
 
     expect(response.status).toEqual(400)
     expect(contentType).toEqual('application/json')
-    expect(json.error).toEqual('Invalid request body - request body not present or empty')
+    expect(json.errorMessage).toEqual('Invalid request body - request body not present or empty')
   })
 
 
@@ -50,7 +50,7 @@ describe('POST - scheduling-api', () => {
 
     expect(response.status).toEqual(400)
     expect(contentType).toEqual('application/json')
-    expect(json.error).toEqual('Invalid request body - payload contains no data')
+    expect(json.errorMessage).toEqual('Invalid request body - payload contains no data')
   })
 
   it('returns 500 if the reservation API has an internal error', async () => {
@@ -66,7 +66,7 @@ describe('POST - scheduling-api', () => {
 
     expect(response.status).toEqual(500)
     expect(contentType).toEqual('application/json')
-    expect(json.error).toEqual('Upstream error: Internal Server Error')
+    expect(json.errorMessage).toEqual('Upstream error: Internal Server Error')
   })
 
   it('should read a single reservation in hydrated form and provide correctly adjusted local start and end times - POST {reservationId=}', async () => {

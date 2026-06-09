@@ -29,7 +29,7 @@ type ComputedReservationData = {
   durationMinutes: Number,
 }
 
-type HydratedReservationData = null | ReservationData & ComputedReservationData & { resource: ResourceData}
+export type HydratedReservationData = null | ReservationData & ComputedReservationData & { resource: ResourceData }
 
 const catalogAPIURL = 'http://localhost:4040/';
 const reservationsAPIURL = 'http://localhost:5050/';
@@ -49,7 +49,10 @@ export const POST = async (request: NextRequest) => {
 
 
   if(!request.body || (request.body.constructor === Object && Object.keys(request.body).length === 0)) {
-    return new Response(JSON.stringify({ error: 'Invalid request body - request body not present or empty'}), {
+    return new Response(JSON.stringify({
+      error: 400,
+      errorMessage: 'Invalid request body - request body not present or empty'
+    }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
@@ -58,21 +61,30 @@ export const POST = async (request: NextRequest) => {
   const payload: ReservationRequest = await request.json();
 
   if (!payload || Object.keys(payload).length === 0) {
-    return new Response(JSON.stringify({ error: 'Invalid request body - payload contains no data'}), {
+    return new Response(JSON.stringify({
+      error: 400,
+      errorMessage: 'Invalid request body - payload contains no data'
+    }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
   }
 
   if (!payload.reservationId) {
-    return new Response(JSON.stringify({ error: 'Invalid request body - no reservationId received'}), {
+    return new Response(JSON.stringify({
+      error: 400,
+      errorMessage: 'Invalid request body - no reservationId received'
+    }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
   }
 
   if (!payload.timezone) {
-    return new Response(JSON.stringify({ error: 'Invalid request body - no timezone identifier received'}), {
+    return new Response(JSON.stringify({
+      error: 400,
+      errorMessage: 'Invalid request body - no timezone identifier received'
+    }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
@@ -86,7 +98,10 @@ export const POST = async (request: NextRequest) => {
   const response = await FetchApiOnClient(reservationIdURL, 'GET');
 
   if (response.error) {
-    return new Response(JSON.stringify({ error: `Upstream error: ${response.errorMessage}`}), {
+    return new Response(JSON.stringify({
+      error: response.error,
+      errorMessage: `Upstream error: ${response.errorMessage}`
+    }), {
       status: response.error,
       headers: { 'Content-Type': 'application/json' }
     });
@@ -105,7 +120,10 @@ export const POST = async (request: NextRequest) => {
     const resourceResponse = await FetchApiOnClient(resourceIdURL, 'GET', null);
 
     if (Object.keys(resourceResponse).length === 0) {
-      return new Response(JSON.stringify({ error: `Server error - no resource with id ${reservationData.resourceId}`}), {
+      return new Response(JSON.stringify({
+        name: 500,
+        error: `Server error - no resource with id ${reservationData.resourceId}`
+      }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' }
       });

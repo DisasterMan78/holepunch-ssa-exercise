@@ -2,10 +2,15 @@
 
 import { useEffect } from 'react'
 
+export type ApiError = {
+  error: number,
+  errorMessage: string,
+}
+
 export default function Error({
   error,
 }: {
-  error: Error & { digest?: string }
+  error: ApiError,
   reset: () => void
 }) {
   useEffect(() => {
@@ -16,7 +21,8 @@ export default function Error({
   return (
     <div role="alert" aria-live="assertive">
       <h2>Something went wrong!</h2>
-      <p>{error.message}</p>
+      <h3>{error.error}</h3>
+      <p>{error.errorMessage}</p>
     </div>
   )
 }
