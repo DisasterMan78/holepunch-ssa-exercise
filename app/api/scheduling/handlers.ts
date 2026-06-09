@@ -77,7 +77,6 @@ export const getSingleReservation = async (payload) => {
 }
 
 
-
 export const getReservationsList = async (payload) => {
 
   let hydratedReservationsData: HydratedReservationData[] = [];
@@ -121,8 +120,8 @@ export const getReservationsList = async (payload) => {
     if (!payload.page) {
       payload.page = 0;
     }
-    const startIndex = payload.page * payload.paginationSize;
-    const endIndex = startIndex + payload.paginationSize;
+    const startIndex = parseInt(payload.page) * parseInt(payload.paginationSize);
+    const endIndex = startIndex + parseInt(payload.paginationSize);
 
     hydratedReservationsData = hydratedReservationsData.slice(startIndex, endIndex)
   }
