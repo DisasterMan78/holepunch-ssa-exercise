@@ -56,7 +56,7 @@ export const getSingleReservation = async (payload) => {
     errorResponseResourceId(reservationResponse.resourceId)
   }
 
-  const { localStartsAt, localEndsAt, durationMinutes } = calculateReservationTimes(reservationResponse.startsAt, reservationResponse.endsAt, payload.timezone);
+  const { localStartsAt, localEndsAt, durationMinutes } = calculateReservationTimes(reservationResponse.startsAt, reservationResponse.endsAt, payload.timezone, resourceResponse.timezone);
 
   hydratedReservationData = {
     ...reservationResponse,
@@ -101,7 +101,7 @@ export const getReservationsList = async (payload) => {
       errorResponseResourceId(reservationItem.resourceId)
     }
 
-    const { localStartsAt, localEndsAt, durationMinutes } = calculateReservationTimes(reservationItem.startsAt, reservationItem.endsAt, payload.timezone);
+    const { localStartsAt, localEndsAt, durationMinutes } = calculateReservationTimes(reservationItem.startsAt, reservationItem.endsAt, payload.timezone, resourceResponse.timezone);
 
     const hydratedItem: HydratedReservationData = {
       ...reservationItem,
@@ -144,10 +144,10 @@ const errorResponseResourceId = (id) => {
   });
 }
 
-const calculateReservationTimes = (start, end, timezone) => {
+const calculateReservationTimes = (start, end, localTimezone, resourceTimezone) => {
   return {
-  localStartsAt: localiseDatetime(timezone, start),
-  localEndsAt: localiseDatetime(timezone, end),
+  localStartsAt: localiseDatetime(start, localTimezone, resourceTimezone),
+  localEndsAt: localiseDatetime(end, localTimezone, resourceTimezone),
   durationMinutes: dateDiffInMins(start, end)
   }
 }

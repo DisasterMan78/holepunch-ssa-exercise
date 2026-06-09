@@ -3,10 +3,11 @@ import { dateDiffInMins, localiseDatetime } from '../../app/utils/temporal'
 
 describe('temporal manipulation utilities', () => {
   it('should take a datetime and adjust for local timezone', () => {
-    const localTimezone = 'Europe/Istanbul'
+    const localTimezone = 'Europe/London'
+    const resourceTimezone = 'Europe/Istanbul'
     const now = new Date('2026-06-01 15:38')
 
-    const localisedDatime = localiseDatetime(localTimezone, now)
+    const localisedDatime = localiseDatetime(now, localTimezone, resourceTimezone)
 
     expect(localisedDatime.toISOString()).toEqual('2026-01-06T17:38:00.000Z')
   })

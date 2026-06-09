@@ -88,8 +88,8 @@ describe('POST - scheduling-api', () => {
         endsAt: "2026-06-02T16:00:00Z",
         holder: "carol@example.com",
         id: 3,
-        localEndsAt: "2026-02-06T19:00:00.000Z",
-        localStartsAt: "2026-02-06T17:00:00.000Z",
+        localEndsAt: "2026-02-06T18:00:00.000Z",
+        localStartsAt: "2026-02-06T16:00:00.000Z",
         resource: {
           capacity: 1,
           id: 2,
@@ -105,8 +105,8 @@ describe('POST - scheduling-api', () => {
         endsAt: "2026-06-03T17:00:00Z",
         holder: "dave@example.com",
         id: 4,
-        localEndsAt: "2026-03-06T20:00:00.000Z",
-        localStartsAt: "2026-03-06T11:00:00.000Z",
+        localEndsAt: "2026-03-06T15:00:00.000Z",
+        localStartsAt: "2026-03-06T06:00:00.000Z",
         resource: {
           capacity: 9,
           id: 3,
@@ -263,8 +263,8 @@ describe('POST - scheduling-api', () => {
         endsAt: "2026-06-02T16:00:00Z",
         holder: "carol@example.com",
         id: 3,
-        localEndsAt: "2026-02-06T19:00:00.000Z",
-        localStartsAt: "2026-02-06T17:00:00.000Z",
+        localEndsAt: "2026-02-06T18:00:00.000Z",
+        localStartsAt: "2026-02-06T16:00:00.000Z",
         resource: {
           capacity: 1,
           id: 2,
@@ -280,8 +280,8 @@ describe('POST - scheduling-api', () => {
         endsAt: "2026-06-03T17:00:00Z",
         holder: "dave@example.com",
         id: 4,
-        localEndsAt: "2026-03-06T20:00:00.000Z",
-        localStartsAt: "2026-03-06T11:00:00.000Z",
+        localEndsAt: "2026-03-06T15:00:00.000Z",
+        localStartsAt: "2026-03-06T06:00:00.000Z",
         resource: {
           capacity: 9,
           id: 3,

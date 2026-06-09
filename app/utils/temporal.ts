@@ -9,11 +9,11 @@ const intlDateTimeOptions:Intl.DateTimeFormatOptions = {
   timeZone: "UTC"
 };
 
-export const localiseDatetime = (localTimezone, datetime) => {
+export const localiseDatetime = (datetime, localTimezone, resourceTimezone) => {
   intlDateTimeOptions.timeZone = localTimezone;
 
   const formatter = new Intl.DateTimeFormat('en-GB', intlDateTimeOptions)
-  const originalDate = new Date(datetime)
+  const originalDate = new Date(new Date(datetime).toLocaleString("en-US", {timeZone: resourceTimezone}))
 
   return new Date(formatter.format(originalDate))
 }
