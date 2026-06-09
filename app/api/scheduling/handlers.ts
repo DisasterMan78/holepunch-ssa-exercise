@@ -50,59 +50,35 @@ export const getSingleReservation = async (payload) => {
     });
   }
 
-  let reservationData: ReservationData;
   let hydratedReservationData: HydratedReservationData;
 
   const reservationIdURL = `${reservationsAPIURL}${payload.reservationId}`;
-  console.log("🚀 ~ getSingleReservation ~ reservationIdURL:", reservationIdURL)
 
-  const response = await FetchApiOnClient(reservationIdURL, 'GET');
+  const reservationResponse = await FetchApiOnClient(reservationIdURL, 'GET');
 
-  if (response.error) {
+  if (reservationResponse.error) {
     return new Response(JSON.stringify({
-      error: response.error,
-      errorMessage: `Upstream error: ${response.errorMessage}`
+      error: reservationResponse.error,
+      errorMessage: `Upstream error: ${reservationResponse.errorMessage}`
     }), {
-      status: response.error,
+      status: reservationResponse.error,
       headers: { 'Content-Type': 'application/json' }
     });
   }
 
-  reservationData = {
-    id: response.id,
-    resourceId: response.resourceId,
-    holder: response.holder,
-    startsAt: response.startsAt,
-    endsAt: response.endsAt
-  }
-
-  if (reservationData.resourceId) {
-    const resourceIdURL = `${catalogAPIURL}${reservationData.resourceId}`;
+  if (reservationResponse.resourceId) {
+    const resourceIdURL = `${catalogAPIURL}${reservationResponse.resourceId}`;
     const resourceResponse = await FetchApiOnClient(resourceIdURL, 'GET', null);
 
     if (Object.keys(resourceResponse).length === 0) {
-      return new Response(JSON.stringify({
-        name: 500,
-        error: `Server error - no resource with id ${reservationData.resourceId}`
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    const resourceData:ResourceData = {
-      id: resourceResponse.id,
-      name: resourceResponse.name,
-      kind: resourceResponse.kind,
-      capacity: resourceResponse.capacity,
-      timezone: resourceResponse.timezone,
+      errorResponseResourceId(reservationResponse.resourceId)
     }
 
     intlDateTimeOptions.timeZone = payload.timezone;
     const formatter = new Intl.DateTimeFormat('en-GB', intlDateTimeOptions)
 
-    const startDate = new Date(reservationData.startsAt)
-    const endDate = new Date(reservationData.endsAt)
+    const startDate = new Date(reservationResponse.startsAt)
+    const endDate = new Date(reservationResponse.endsAt)
 
     const localStartsAt = new Date(formatter.format(startDate))
 
@@ -111,9 +87,9 @@ export const getSingleReservation = async (payload) => {
     const durationMinutes = Math.abs(startDate.getTime() - endDate.getTime()) / 1000 / 60;
 
     hydratedReservationData = {
-      ...reservationData,
+      ...reservationResponse,
       resource: {
-        ...resourceData,
+        ...resourceResponse,
       },
       localStartsAt,
       localEndsAt,
@@ -125,6 +101,80 @@ export const getSingleReservation = async (payload) => {
     ...hydratedReservationData,
   }), {
     status: 200,
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+
+
+export const getReservationsList = async (payload) => {
+
+  let hydratedReservationsData: HydratedReservationData[] = [];
+
+    const reservationListURL = reservationsAPIURL;
+
+  const reservationsResponse = await FetchApiOnClient(reservationListURL, 'GET');
+
+  if (reservationsResponse.error) {
+    return new Response(JSON.stringify({
+      error: reservationsResponse.error,
+      errorMessage: `Upstream error: ${reservationsResponse.errorMessage}`
+    }), {
+      status: reservationsResponse.error,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  for (const reservationItem: ReservationData of reservationsResponse) {
+
+    if (reservationItem.id) {
+
+      const resourceIdURL = `${catalogAPIURL}${reservationItem.resourceId}`;
+      const resourceResponse = await FetchApiOnClient(resourceIdURL, 'GET', null);
+
+      if (Object.keys(resourceResponse).length === 0) {
+        errorResponseResourceId(reservationItem.resourceId)
+      }
+
+      intlDateTimeOptions.timeZone = payload.timezone;
+      const formatter = new Intl.DateTimeFormat('en-GB', intlDateTimeOptions)
+
+      const startDate = new Date(reservationItem.startsAt)
+      const endDate = new Date(reservationItem.endsAt)
+
+      const localStartsAt = new Date(formatter.format(startDate))
+      const localEndsAt = new Date(formatter.format(endDate))
+
+      const durationMinutes = Math.abs(startDate.getTime() - endDate.getTime()) / 1000 / 60;
+
+      const hydratedItem: HydratedReservationData = {
+        ...reservationItem,
+        resource: {
+          ...resourceResponse,
+        },
+        localStartsAt,
+        localEndsAt,
+        durationMinutes,
+      }
+
+      hydratedReservationsData.push(hydratedItem);
+    }
+  };
+
+  return new Response(JSON.stringify({
+    ...hydratedReservationsData,
+  }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+const errorResponseResourceId = (id) => {
+  return new Response(JSON.stringify({
+    name: 500,
+    error: `Server error - no resource with id ${id}`
+  }), {
+    status: 500,
     headers: { 'Content-Type': 'application/json' }
   });
 }

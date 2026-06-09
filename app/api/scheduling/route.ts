@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 
-import { getSingleReservation } from "./handlers";
+import { getReservationsList, getSingleReservation } from "./handlers";
 
 type ReservationRequest = {
   reservationId: number,
@@ -41,7 +41,11 @@ export const POST = async (request: NextRequest) => {
     });
   }
 
-  const requestURL = new URL(request.url)
+  const requestURL = new URL(request.url);
+
+  if (requestURL.pathname === '/api/scheduling/list') {
+    return getReservationsList(payload);
+  }
 
   if (requestURL.pathname === '/api/scheduling') {
     return getSingleReservation(payload);
