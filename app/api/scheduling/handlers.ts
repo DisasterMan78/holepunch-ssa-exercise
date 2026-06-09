@@ -82,7 +82,11 @@ export const getReservationsList = async (payload) => {
 
   let hydratedReservationsData: HydratedReservationData[] = [];
 
-    const reservationListURL = reservationsAPIURL;
+  let reservationListURL = reservationsAPIURL;
+
+  if (payload.resourceId) {
+    reservationListURL += `?resourceId=${payload.resourceId}`
+  }
 
   const reservationsResponse = await FetchApiOnClient(reservationListURL, 'GET');
 

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { NextRequest } from 'next/server'
 
 import { POST } from '../../../app/api/scheduling/route'
-import { testSchedulingAPIURL, testSchedulingListAPIURL } from '../../../mocks/msw.mock'
+import { testSchedulingAPIURL } from '../../../mocks/msw.mock'
 
 describe('POST - scheduling-api', () => {
 
@@ -69,7 +69,7 @@ describe('POST - scheduling-api', () => {
       expect(json.errorMessage).toEqual('Upstream error: Internal Server Error')
     })
 
-    it('should read a single reservation in hydrated form and provide correctly adjusted local start and end times - POST {reservationId=}', async () => {
+    it('should read a single reservation in hydrated form and provide correctly adjusted local start and end times - POST /scheduling/', async () => {
       const request = new NextRequest(new Request(`${testSchedulingAPIURL}`, {
         method: 'POST',
         body: JSON.stringify({

@@ -35,7 +35,7 @@ describe('POST - scheduling-api', () => {
     expect(json.errorMessage).toEqual('Invalid request body - payload contains no data')
   })
 
-  it('should list all reservations in hydrated form - POST /list', async () => {
+  it('should list all reservations in hydrated form - POST /scheduling/list/', async () => {
     const request = new NextRequest(new Request(testSchedulingListAPIURL, {
       method: 'POST',
       body: JSON.stringify({
@@ -137,7 +137,7 @@ describe('POST - scheduling-api', () => {
     })
   })
 
-  it('should list all reservations filtered by resourceId - POST /list/{id}', async () => {
+  it('should list all reservations filtered by resourceId - POST /scheduling/list/', async () => {
     const request = new NextRequest(new Request(testSchedulingListAPIURL, {
       method: 'POST',
       body: JSON.stringify({
