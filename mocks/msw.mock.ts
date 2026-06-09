@@ -3,8 +3,8 @@ import { afterAll, afterEach, beforeAll } from 'vitest'
 import { http, HttpResponse, passthrough } from 'msw'
 import { setupServer } from "msw/node";
 
-export const testShedulingAPIURL = 'http://localhost:3000/api/scheduling'
-export const testShedulingListAPIURL = `${testShedulingAPIURL}/list`
+export const testSchedulingAPIURL = 'http://localhost:3000/api/scheduling/'
+export const testSchedulingListAPIURL = `${testSchedulingAPIURL}list/`
 export const testCatalogAPIURL = 'http://localhost:4040/'
 export const testCatalogAPIgetURL = `${testCatalogAPIURL}:id`
 export const testReservationAPIURL = 'http://localhost:5050/'
@@ -15,13 +15,10 @@ export const testAPIResponse = {
 }
 
 export const server = setupServer(
-  http.post(testShedulingAPIURL, async () => HttpResponse.json(testAPIResponse)),
-  http.get(testCatalogAPIgetURL, ({ request }) => {
-    return passthrough()
-  }),
-  http.get(testReservationAPIgetURL, ({ request }) => {
-    return passthrough()
-  })
+  http.post(testSchedulingAPIURL, async () => HttpResponse.json(testAPIResponse)),
+  http.get(testReservationAPIURL, ({ request }) => passthrough()),
+  http.get(testReservationAPIgetURL, ({ request }) => passthrough()),
+  http.get(testCatalogAPIgetURL, ({ request }) => passthrough()),
 )
 
 beforeAll(() => server.listen({

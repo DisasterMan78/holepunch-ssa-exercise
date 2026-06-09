@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
-
-import { getSingleReservation } from "./handlers";
+import { getReservationsList } from "../handlers";
 
 type ReservationRequest = {
   reservationId: number,
@@ -32,6 +31,7 @@ export const POST = async (request: NextRequest) => {
   }
 
   if (!payload.timezone) {
+    console.log('no timezone')
     return new Response(JSON.stringify({
       error: 400,
       errorMessage: 'Invalid request body - no timezone identifier received'
@@ -41,5 +41,5 @@ export const POST = async (request: NextRequest) => {
     });
   }
 
-  return getSingleReservation(payload);
+  return getReservationsList(payload);
 }

@@ -4,26 +4,54 @@ import { SubmitEvent, useState } from 'react';
 import { FetchApiOnClient } from './utils/fetch-api';
 import SchedulingForm, { SchedulingFormProps } from './components/scheduling-form';
 import {ApiError, default as ErrorUI} from './error';
-import { HydratedReservationData } from './api/scheduling/route';
 
 import styles from './page.module.css';
+import { HydratedReservationData } from './api/scheduling/handlers';
+
+type RequestOptions = {
+  reservationId?: number,
+}
 
 const Home = () => {
   const [error, setError] = useState<null | ApiError>(null);
   const [dataIsLoading, setDataIsLoading] = useState(false);
   const [response, setResponse] = useState<HydratedReservationData | undefined>(undefined);
+  const endpoints = {
+    reservation: 'http://localhost:3000/api/scheduling/',
+    list: 'http://localhost:3000/api/scheduling/list/'
+  }
+  let apiUrl = endpoints.reservation;
 
-  const onRevenueSubmitFn = (e: SubmitEvent<HTMLFormElement>) => {
+  const onSubmitFn = (event: SubmitEvent<HTMLFormElement>) => {
     setDataIsLoading(true);
     setResponse(undefined);
     setError(null);
 
-    const payload = {
+    const form = event.target
+
+    const requestType = form['api-request-type'].value;
+    console.log("🚀 ~ onSubmitFn ~ requestType:", requestType)
+    const requestOptions: RequestOptions = {
       reservationId: 1,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
     };
 
-    FetchApiOnClient('http://localhost:3000/api/scheduling', 'POST', payload)
+    switch (requestType) {
+      case 'reservation':
+        requestOptions.reservationId = form.reservationId.value;
+      break;
+      case 'list':
+        delete requestOptions.reservationId;
+        apiUrl = endpoints.list;
+      break;
+    }
+
+    const payload = {
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      ...requestOptions
+    };
+    console.log("🚀 ~ onSubmitFn ~ payload:", payload)
+
+    FetchApiOnClient(apiUrl, 'POST', payload)
       .catch(error => {
         setError(error as ApiError);
       })
@@ -38,7 +66,7 @@ const Home = () => {
   };
 
   const schedulingFormProps: SchedulingFormProps = {
-    onSubmitFn: onRevenueSubmitFn,
+    onSubmitFn: onSubmitFn,
   }
 
   return (
@@ -51,10 +79,16 @@ const Home = () => {
           <ErrorUI error={error} reset={() => { }} />
           )
         }
-        <textarea
-          className={styles.reponseTextarea}
-          value={JSON.stringify(response, null, 2)}
-        />
+        {!dataIsLoading && (
+          <textarea
+            readOnly
+            className={styles.reponseTextarea}
+            value={JSON.stringify(response, null, 2)}
+          />
+        )}
+        {dataIsLoading && (
+          <h3>Data loading...</h3>
+        )}
       </main>
     </div>
   );
