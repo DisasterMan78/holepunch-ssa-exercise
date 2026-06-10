@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { getReservationsList } from "../handlers";
+import { getReservationsList, noBodyErrorResponse, noPayloadErrorResponse, noTimezoneErrorResponse } from "../handlers";
 
 type ReservationRequest = {
   reservationId: number,
@@ -9,36 +9,17 @@ type ReservationRequest = {
 export const POST = async (request: NextRequest) => {
 
   if(!request.body || (request.body.constructor === Object && Object.keys(request.body).length === 0)) {
-    return new Response(JSON.stringify({
-      error: 400,
-      errorMessage: 'Invalid request body - request body not present or empty'
-    }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return noBodyErrorResponse();
   }
 
   const payload: ReservationRequest = await request.json();
 
   if (!payload || Object.keys(payload).length === 0) {
-    return new Response(JSON.stringify({
-      error: 400,
-      errorMessage: 'Invalid request body - payload contains no data'
-    }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return noPayloadErrorResponse();
   }
 
   if (!payload.timezone) {
-    console.log('no timezone')
-    return new Response(JSON.stringify({
-      error: 400,
-      errorMessage: 'Invalid request body - no timezone identifier received'
-    }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return noTimezoneErrorResponse();
   }
 
   return getReservationsList(payload);

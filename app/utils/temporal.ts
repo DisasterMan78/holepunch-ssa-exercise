@@ -10,6 +10,7 @@ const intlDateTimeOptions:Intl.DateTimeFormatOptions = {
 };
 
 export const localiseDatetime = (datetime, localTimezone, resourceTimezone) => {
+  console.log("🚀 ~ localiseDatetime ~ datetime, localTimezone, resourceTimezone:", datetime, localTimezone, resourceTimezone)
   intlDateTimeOptions.timeZone = localTimezone;
 
   const formatter = new Intl.DateTimeFormat('en-GB', intlDateTimeOptions)

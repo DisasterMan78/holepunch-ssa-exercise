@@ -5,6 +5,7 @@ import { setupServer } from "msw/node";
 
 export const testSchedulingAPIURL = 'http://localhost:3000/api/scheduling/'
 export const testSchedulingListAPIURL = `${testSchedulingAPIURL}list/`
+export const testSchedulingAddAPIURL = `${testSchedulingAPIURL}add/`
 export const testCatalogAPIURL = 'http://localhost:4040/'
 export const testCatalogAPIgetURL = `${testCatalogAPIURL}:id`
 export const testReservationAPIURL = 'http://localhost:5050/'

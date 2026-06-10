@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
-
-import { getSingleReservation, noBodyErrorResponse, noPayloadErrorResponse, noTimezoneErrorResponse } from "./handlers";
+import { addReservation, getReservationsList, noBodyErrorResponse, noPayloadErrorResponse, noTimezoneErrorResponse } from "../handlers";
 
 type ReservationRequest = {
   reservationId: number,
@@ -10,7 +9,7 @@ type ReservationRequest = {
 export const POST = async (request: NextRequest) => {
 
   if(!request.body || (request.body.constructor === Object && Object.keys(request.body).length === 0)) {
-    return noBodyErrorResponse();
+    return noBodyErrorResponse()
   }
 
   const payload: ReservationRequest = await request.json();
@@ -23,5 +22,5 @@ export const POST = async (request: NextRequest) => {
     return noTimezoneErrorResponse();
   }
 
-  return getSingleReservation(payload);
+  return addReservation(payload);
 }

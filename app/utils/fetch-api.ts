@@ -26,7 +26,7 @@ export const FetchApiOnClient = async (apiURL: string, method: Methods, payload?
   try {
     const response = await fetch(apiURL, fetchInit);
 
-    if (response.status !== 200) {
+    if (response.status !== 200 &&  response.status !== 201) {
       return {
         error: response.status,
         errorMessage: response.statusText,

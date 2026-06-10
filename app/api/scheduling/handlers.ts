@@ -1,3 +1,4 @@
+import { ApiError } from "../../error";
 import { FetchApiOnClient } from "../../utils/fetch-api";
 import { dateDiffInMins, localiseDatetime } from "../../utils/temporal";
 
@@ -16,6 +17,8 @@ type ReservationData = {
   startsAt: Date,
   endsAt:   Date,
 }
+
+type ReservationsResponse = ReservationData[] | ApiError;
 
 type ComputedReservationData = {
   localStartsAt: Date,
@@ -50,7 +53,7 @@ export const getSingleReservation = async (payload) => {
 
   // Just assuming reservation items are correctly formed - should do a check to ensure resourceId is present and is a number
   const resourceIdURL = `${catalogAPIURL}${reservationResponse.resourceId}`;
-  const resourceResponse = await FetchApiOnClient(resourceIdURL, 'GET', null);
+  const resourceResponse = await FetchApiOnClient(resourceIdURL, 'GET', undefined);
 
   if (Object.keys(resourceResponse).length === 0) {
     errorResponseResourceId(reservationResponse.resourceId)
@@ -87,15 +90,18 @@ export const getReservationsList = async (payload) => {
     reservationListURL += `?resourceId=${payload.resourceId}`
   }
 
-  const reservationsResponse = await FetchApiOnClient(reservationListURL, 'GET');
+  const reservationsResponse:ReservationsResponse = await FetchApiOnClient(reservationListURL, 'GET');
+  console.log("🚀 ~ getReservationsList ~ reservationsResponse:", reservationsResponse)
 
-  if (reservationsResponse.error) { return upstreamErrorResponse(reservationsResponse) }
+  if ((reservationsResponse as ApiError).error) { return upstreamErrorResponse(reservationsResponse) }
 
-  for (const reservationItem of reservationsResponse) {
+  const reservationsArray = reservationsResponse as ReservationData[]
+
+  for (const reservationItem of reservationsArray) {
 
     // Just assuming reservation items are correctly formed - should do a check to ensure resourceId is present and is a number
     const resourceIdURL = `${catalogAPIURL}${reservationItem.resourceId}`;
-    const resourceResponse = await FetchApiOnClient(resourceIdURL, 'GET', null);
+    const resourceResponse = await FetchApiOnClient(resourceIdURL, 'GET', undefined);
 
     if (Object.keys(resourceResponse).length === 0) {
       errorResponseResourceId(reservationItem.resourceId)
@@ -134,6 +140,32 @@ export const getReservationsList = async (payload) => {
   });
 }
 
+
+export const addReservation = async (payload) => {
+  let addReservationURL = `${reservationsAPIURL}/add/`;
+
+  const addReservationResponse = await FetchApiOnClient(addReservationURL, 'POST', payload);
+
+  if (addReservationResponse.error) { return upstreamErrorResponse(addReservationResponse) }
+
+  return new Response(JSON.stringify({
+    ...addReservationResponse,
+  }), {
+    status: 201,
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+
+const calculateReservationTimes = (start, end, localTimezone, resourceTimezone) => {
+  return {
+  localStartsAt: localiseDatetime(start, localTimezone, resourceTimezone),
+  localEndsAt: localiseDatetime(end, localTimezone, resourceTimezone),
+  durationMinutes: dateDiffInMins(start, end)
+  }
+}
+
+
 const errorResponseResourceId = (id) => {
   return new Response(JSON.stringify({
     name: 500,
@@ -144,18 +176,37 @@ const errorResponseResourceId = (id) => {
   });
 }
 
-const calculateReservationTimes = (start, end, localTimezone, resourceTimezone) => {
-  return {
-  localStartsAt: localiseDatetime(start, localTimezone, resourceTimezone),
-  localEndsAt: localiseDatetime(end, localTimezone, resourceTimezone),
-  durationMinutes: dateDiffInMins(start, end)
-  }
-}
 
 const upstreamErrorResponse = (errorResponse) => new Response(JSON.stringify({
     error: errorResponse.error,
     errorMessage: `Upstream error: ${errorResponse.errorMessage}`
   }), {
     status: errorResponse.error,
+    headers: { 'Content-Type': 'application/json' }
+  });
+
+
+export const noBodyErrorResponse = () => new Response(JSON.stringify({
+    error: 400,
+    errorMessage: 'Invalid request body - request body not present or empty'
+  }), {
+    status: 400,
+    headers: { 'Content-Type': 'application/json' }
+  });
+
+
+export const noPayloadErrorResponse = () => new Response(JSON.stringify({
+    error: 400,
+    errorMessage: 'Invalid request body - payload contains no data'
+  }), {
+    status: 400,
+    headers: { 'Content-Type': 'application/json' }
+});
+
+export const noTimezoneErrorResponse = () => new Response(JSON.stringify({
+    error: 400,
+    errorMessage: 'Invalid request body - no timezone identifier received'
+  }), {
+    status: 400,
     headers: { 'Content-Type': 'application/json' }
   });
