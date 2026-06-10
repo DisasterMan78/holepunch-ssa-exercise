@@ -8,12 +8,25 @@ import {ApiError, default as ErrorUI} from './error';
 import styles from './page.module.css';
 import { HydratedReservationData } from './api/scheduling/handlers';
 
-type RequestOptions = {
-  reservationId?: number,
+type ReservationOptions = {
+  reservationId?: number
+}
+
+type ListOptions = {
   resourceId?: number,
   paginationSize?: number,
   page?: number,
 }
+
+type AddReservationOptions = {
+  holder: string,
+  resourceId: number,
+  date: Date,
+  startsAt: string,
+  endsAt: string,
+}
+
+type RequestOptions = ReservationOptions | ListOptions | AddReservationOptions;
 
 const Home = () => {
   const [error, setError] = useState<null | ApiError>(null);
@@ -21,7 +34,8 @@ const Home = () => {
   const [response, setResponse] = useState<HydratedReservationData | undefined>(undefined);
   const endpoints = {
     reservation: 'http://localhost:3000/api/scheduling/',
-    list: 'http://localhost:3000/api/scheduling/list/'
+    list: 'http://localhost:3000/api/scheduling/list/',
+    addReservation: 'http://localhost:3000/api/scheduling/add/',
   }
   let apiUrl = endpoints.reservation;
 
@@ -33,18 +47,41 @@ const Home = () => {
     const form = event.target
 
     const requestType = form.apiRequestType.value;
-    const requestOptions: RequestOptions = {};
+    let requestOptions: RequestOptions = {};
+
+    const resetRequestOptions = () => {
+      requestOptions = {}
+    }
 
     switch (requestType) {
       case 'reservation':
-        requestOptions.reservationId = form.reservationId.value;
+        resetRequestOptions();
+        apiUrl = endpoints.reservation;
+        (requestOptions as ReservationOptions).reservationId = form.reservationId.value;
       break;
+
       case 'list':
-        delete requestOptions.reservationId;
+        resetRequestOptions();
         apiUrl = endpoints.list;
-        requestOptions.resourceId = form.resourceId.value;
-        requestOptions.paginationSize = form.paginationSize.value;
-        requestOptions.page = form.page.value - 1;
+        (requestOptions as ListOptions).resourceId = form.resourceId.value;
+        (requestOptions as ListOptions).paginationSize = form.paginationSize.value;
+        (requestOptions as ListOptions).page = form.page.value - 1;
+      break;
+
+      case 'add':
+        resetRequestOptions();
+        apiUrl = endpoints.addReservation;
+        const reservationEndDate = new Date(form.date.value);
+
+        (requestOptions as AddReservationOptions).holder = form.holder.value;
+        (requestOptions as AddReservationOptions).resourceId = form.resourceId.value;
+        (requestOptions as AddReservationOptions).startsAt = new Date(`${form.date.value} ${form.startsAt.value}`).toISOString();
+        console.log("🚀 ~ onSubmitFn ~ form.startsAt.value, form.endsAt.value:", form.startsAt.value, form.endsAt.value)
+        console.log("🚀 ~ onSubmitFn ~ form.startsAt.value > form.endsAt.value:", form.startsAt.value > form.endsAt.value)
+        if (form.startsAt.value > form.endsAt.value) {
+          reservationEndDate.setDate(reservationEndDate.getDate() + 1)
+        }
+        (requestOptions as AddReservationOptions).endsAt = new Date(`${reservationEndDate.getFullYear()}-${reservationEndDate.getMonth() + 1}-${reservationEndDate.getDate()} ${form.endsAt.value}`).toISOString();
       break;
     }
 
@@ -58,7 +95,7 @@ const Home = () => {
         setError(error as ApiError);
       })
       .then((response: HydratedReservationData | ApiError) => {
-        if ('error' in response) {
+        if (response && 'error' in response) {
           setError(response as ApiError);
         } else {
           setResponse(response as HydratedReservationData);
