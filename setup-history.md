@@ -166,3 +166,8 @@ Lol. Current Jest needs >=24
   ```
   $ rm -rfv vitest-example
   ```
+
+- Add HeroUI, Tailwind (YUCK!), PostCSS to improve the UI slightly and support complex date/time pickers
+  ```
+  $ yarn add  @heroui/styles @heroui/react tailwindcss postcss @tailwindcss/postcss
+  ```
