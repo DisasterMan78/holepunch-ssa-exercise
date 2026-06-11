@@ -48,6 +48,7 @@ export const getSingleReservation = async (payload) => {
   const reservationIdURL = `${reservationsAPIURL}${payload.reservationId}`;
 
   const reservationResponse = await FetchApiOnClient(reservationIdURL, 'GET');
+  console.log("🚀 ~ getSingleReservation ~ reservationResponse:", reservationResponse)
 
   if (reservationResponse.error) { return upstreamErrorResponse(reservationResponse) }
 
@@ -91,7 +92,6 @@ export const getReservationsList = async (payload) => {
   }
 
   const reservationsResponse:ReservationsResponse = await FetchApiOnClient(reservationListURL, 'GET');
-  console.log("🚀 ~ getReservationsList ~ reservationsResponse:", reservationsResponse)
 
   if ((reservationsResponse as ApiError).error) { return upstreamErrorResponse(reservationsResponse) }
 

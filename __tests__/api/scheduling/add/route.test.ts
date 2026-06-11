@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { NextRequest } from 'next/server'
 
 import { POST } from '../../../../app/api/scheduling/add/route'
-import { testSchedulingAddAPIURL } from '../../../../mocks/msw.mock'
+import { testSchedulingAddAPIURL, testSchedulingAPIURL } from '../../../../mocks/msw.mock'
 
 describe('POST - scheduling-api', () => {
 
@@ -40,11 +40,11 @@ describe('POST - scheduling-api', () => {
     const request = new NextRequest(new Request(testSchedulingAddAPIURL, {
       method: 'POST',
       body: JSON.stringify({
-        timezone: "Europe/London",
-        holder: "dmbenson1978@gmail.com",
+        timezone: 'Europe/London',
+        holder: 'dmbenson1978@gmail.com',
         resourceId: 5,
-        startsAt: "2026-06-30T11:05:00.000Z",
-        endsAt: "2026-06-30T14:03:00.000Z"
+        startsAt: '2026-06-30T11:05:00.000Z',
+        endsAt: '2026-06-30T14:03:00.000Z'
       })
     }))
     const response = await POST(request)
@@ -55,8 +55,53 @@ describe('POST - scheduling-api', () => {
     expect(contentType).toEqual('application/json')
     expect(json.id).toBeTruthy()
     expect(json.resourceId).toEqual(5)
-    expect(json.holder).toEqual("dmbenson1978@gmail.com")
-    expect(json.startsAt).toEqual("2026-06-30T11:05:00.000Z")
-    expect(json.endsAt).toEqual("2026-06-30T14:03:00.000Z")
+    expect(json.holder).toEqual('dmbenson1978@gmail.com')
+    expect(json.startsAt).toEqual('2026-06-30T11:05:00.000Z')
+    expect(json.endsAt).toEqual('2026-06-30T14:03:00.000Z')
+  })
+
+
+  it('should read a created reservation - POST /scheduling/:id', async () => {
+    const addRequest = new NextRequest(new Request(testSchedulingAddAPIURL, {
+      method: 'POST',
+      body: JSON.stringify({
+        timezone: 'Antarctica/Davis',
+        holder: 'dmbenson1978@gmail.com',
+        resourceId: 3,
+        startsAt: '2026-06-30T11:05:00.000Z',
+        endsAt: '2026-06-30T14:03:00.000Z'
+      })
+    }))
+    const addResponse = await POST(addRequest)
+    const addJson = await addResponse.json();
+
+    const readRequest = new NextRequest(new Request(`${testSchedulingAPIURL}`, {
+      method: 'POST',
+      body: JSON.stringify({
+        reservationId: addJson.id,
+        timezone: 'Antarctica/Davis'
+      })
+    }))
+    const response = await POST(readRequest)
+    const json = await response.json();
+
+    // TO BE CORRECTED (timezone diff is probably off!)
+    expect(json).toEqual({
+      id: 1,
+      resourceId:   1,
+      holder: 'dmbenson1978@gmail.com',
+        startsAt: '2026-06-30T11:05:00.000Z',
+        endsAt: '2026-06-30T14:03:00.000Z',
+      resource: {
+        id: 3,
+        name: 'Van #4',
+        kind: 'vehicle',
+        capacity: 9,
+        timezone: 'America/New_York'
+      },
+      localStartsAt: '2026-01-30T00:00:00.000Z',
+      localEndsAt: '2026-01-30T03:00:00.000Z',
+      durationMinutes: 178
+    })
   })
 })
