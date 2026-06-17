@@ -1,6 +1,6 @@
 import { ApiError } from "../../error";
 import { FetchApiOnClient } from "../../utils/fetch-api";
-import { dateDiffInMins, localiseDatetime } from "../../utils/temporal";
+import { CalculatedReservationTimes, calculateReservationTimes } from "../../utils/temporal";
 
 type ResourceData = null | {
   id: number,
@@ -59,7 +59,7 @@ export const getSingleReservation = async (payload) => {
     errorResponseResourceId(reservationResponse.resourceId)
   }
 
-  const { localStartsAt, localEndsAt, durationMinutes } = calculateReservationTimes(reservationResponse.startsAt, reservationResponse.endsAt, payload.timezone, resourceResponse.timezone);
+  const { localStartsAt, localEndsAt, durationMinutes }:CalculatedReservationTimes = calculateReservationTimes(new Date(reservationResponse.startsAt), new Date(reservationResponse.endsAt), payload.timezone, resourceResponse.timezone);
 
   hydratedReservationData = {
     ...reservationResponse,
@@ -154,15 +154,6 @@ export const addReservation = async (payload) => {
     status: 201,
     headers: { 'Content-Type': 'application/json' }
   });
-}
-
-
-const calculateReservationTimes = (start, end, localTimezone, resourceTimezone) => {
-  return {
-  localStartsAt: localiseDatetime(start, localTimezone, resourceTimezone),
-  localEndsAt: localiseDatetime(end, localTimezone, resourceTimezone),
-  durationMinutes: dateDiffInMins(start, end)
-  }
 }
 
 

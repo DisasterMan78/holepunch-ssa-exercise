@@ -1,4 +1,10 @@
-const intlDateTimeOptions:Intl.DateTimeFormatOptions = {
+export type CalculatedReservationTimes = {
+  localStartsAt: Date,
+  localEndsAt: Date,
+  durationMinutes: number,
+}
+
+const intlDateTimeOptions: Intl.DateTimeFormatOptions = {
   year: "numeric",
   month: "2-digit",
   day: "2-digit",
@@ -9,12 +15,18 @@ const intlDateTimeOptions:Intl.DateTimeFormatOptions = {
   timeZone: "UTC"
 };
 
-export const localiseDatetime = (datetime, localTimezone, resourceTimezone) => {
-  console.log("🚀 ~ localiseDatetime ~ datetime, localTimezone, resourceTimezone:", datetime, localTimezone, resourceTimezone)
+export const calculateReservationTimes = (start: Date, end: Date, localTimezone: string, resourceTimezone: string): CalculatedReservationTimes => ({
+  localStartsAt: localiseDatetime(start, localTimezone, resourceTimezone),
+  localEndsAt: localiseDatetime(end, localTimezone, resourceTimezone),
+  durationMinutes: dateDiffInMins(start, end)
+})
+
+export const localiseDatetime = (datetime: Date, localTimezone: string, resourceTimezone: string) => {
+  // console.log("🚀 ~ localiseDatetime ~ datetime, localTimezone, resourceTimezone:", datetime, localTimezone, resourceTimezone)
   intlDateTimeOptions.timeZone = localTimezone;
 
   const formatter = new Intl.DateTimeFormat('en-GB', intlDateTimeOptions)
-  const originalDate = new Date(new Date(datetime).toLocaleString("en-US", {timeZone: resourceTimezone}))
+  const originalDate = new Date(datetime.toLocaleString('en-GB', {timeZone: resourceTimezone}))
 
   return new Date(formatter.format(originalDate))
 }
