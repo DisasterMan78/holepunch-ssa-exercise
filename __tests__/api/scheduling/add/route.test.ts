@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { NextRequest } from 'next/server'
 
 import { POST } from '../../../../app/api/scheduling/add/route'
-import { testSchedulingAddAPIURL } from '../../../../mocks/msw.mock'
+import { testSchedulingAddAPIURL, testSchedulingAPIURL } from '../../../../mocks/msw.mock'
 
 describe('POST - scheduling-api', () => {
 
@@ -36,7 +36,7 @@ describe('POST - scheduling-api', () => {
   })
 
 
-  it('should add a reservation - POST /scheduling/add/', async () => {
+  it('should add a reservation POST /scheduling/add/', async () => {
     const request = new NextRequest(new Request(testSchedulingAddAPIURL, {
       method: 'POST',
       body: JSON.stringify({
@@ -58,5 +58,54 @@ describe('POST - scheduling-api', () => {
     expect(json.holder).toEqual("dmbenson1978@gmail.com")
     expect(json.startsAt).toEqual("2026-06-30T11:05:00.000Z")
     expect(json.endsAt).toEqual("2026-06-30T14:03:00.000Z")
+  })
+
+
+  it('should read a created reservation - POST /scheduling/add/', async () => {
+    const addRequest = new NextRequest(new Request(testSchedulingAddAPIURL, {
+      method: 'POST',
+      body: JSON.stringify({
+        timezone: 'Antarctica/Davis',
+        holder: 'dmbenson1978@gmail.com',
+        resourceId: 3,
+        startsAt: '2026-06-12T11:05:00.000Z',
+        endsAt: '2026-06-12T14:03:00.000Z'
+      })
+    }))
+    const addResponse = await POST(addRequest)
+    const addedJson = await addResponse.json();
+
+    const readRequest = new NextRequest(new Request(testSchedulingAPIURL, {
+      method: 'POST',
+      body: JSON.stringify({
+        reservationId: addedJson.id,
+        timezone: 'Antarctica/Davis'
+      })
+    }))
+    const readResponse = await POST(readRequest)
+    const readJson = await readResponse.json();
+
+    if (addedJson.id !== 7) {
+
+      expect(readJson).toEqual({
+        id: addedJson.id,
+        resourceId: 3,
+        holder: 'dmbenson1978@gmail.com',
+        startsAt: '2026-06-12T11:05:00.000Z',
+        endsAt: '2026-06-12T14:03:00.000Z',
+        resource: {
+          id: 3,
+          name: 'Van #4',
+          kind: 'vehicle',
+          capacity: 9,
+          timezone: 'America/New_York'
+        },
+        localStartsAt: '2026-06-12T11:05:00.000Z',
+        localEndsAt: '2026-06-12T14:03:00.000Z',
+        durationMinutes: 178
+      })
+    } else {
+      expect(readResponse.status).toEqual(500)
+    }
   })
 })

@@ -17,13 +17,15 @@ export const testAPIResponse = {
 
 export const server = setupServer(
   http.post(testSchedulingAPIURL, async () => HttpResponse.json(testAPIResponse)),
+  http.get(testSchedulingAddAPIURL, ({ request }) => passthrough()),
   http.get(testReservationAPIURL, ({ request }) => passthrough()),
+  http.post(testReservationAPIURL, ({ request }) => passthrough()),
   http.get(testReservationAPIgetURL, ({ request }) => passthrough()),
   http.get(testCatalogAPIgetURL, ({ request }) => passthrough()),
 )
 
 beforeAll(() => server.listen({
-  onUnhandledRequest: (req) => console.error(`No handler for ${req.url}`),
+  onUnhandledRequest: (req) => console.error(`No handler for ${req.method}: ${req.url}`),
 }))
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())

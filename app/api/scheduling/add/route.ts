@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { addReservation, getReservationsList, noBodyErrorResponse, noPayloadErrorResponse, noTimezoneErrorResponse } from "../handlers";
+import { addReservation, getReservationsList, getSingleReservation, noBodyErrorResponse, noPayloadErrorResponse, noTimezoneErrorResponse } from "../handlers";
 
 type ReservationRequest = {
   reservationId: number,
@@ -20,6 +20,14 @@ export const POST = async (request: NextRequest) => {
 
   if (!payload.timezone) {
     return noTimezoneErrorResponse();
+  }
+
+  // Seems to be a bug with Next API paths
+  // this should be caught by `app/api/scheduling/route.ts`
+  // not `app/api/scheduling/add/route.ts`
+  // Tho realistically I've probably done something stupid somewhere...
+  if (request.url === 'http://localhost:3000/api/scheduling/') {
+    return getSingleReservation(payload)
   }
 
   return addReservation(payload);

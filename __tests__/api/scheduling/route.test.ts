@@ -70,7 +70,7 @@ describe('POST - scheduling-api', () => {
     })
 
     it('should read a single reservation in hydrated form and provide correctly adjusted local start and end times - POST /scheduling/', async () => {
-      const request = new NextRequest(new Request(`${testSchedulingAPIURL}`, {
+      const request = new NextRequest(new Request(testSchedulingAPIURL, {
         method: 'POST',
         body: JSON.stringify({
           reservationId: 1,

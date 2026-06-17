@@ -76,11 +76,11 @@ const Home = () => {
         (requestOptions as AddReservationOptions).holder = form.holder.value;
         (requestOptions as AddReservationOptions).resourceId = form.resourceId.value;
         (requestOptions as AddReservationOptions).startsAt = new Date(`${form.date.value} ${form.startsAt.value}`).toISOString();
-        console.log("🚀 ~ onSubmitFn ~ form.startsAt.value, form.endsAt.value:", form.startsAt.value, form.endsAt.value)
-        console.log("🚀 ~ onSubmitFn ~ form.startsAt.value > form.endsAt.value:", form.startsAt.value > form.endsAt.value)
+
         if (form.startsAt.value > form.endsAt.value) {
           reservationEndDate.setDate(reservationEndDate.getDate() + 1)
         }
+
         (requestOptions as AddReservationOptions).endsAt = new Date(`${reservationEndDate.getFullYear()}-${reservationEndDate.getMonth() + 1}-${reservationEndDate.getDate()} ${form.endsAt.value}`).toISOString();
       break;
     }

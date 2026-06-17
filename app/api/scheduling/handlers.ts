@@ -141,9 +141,7 @@ export const getReservationsList = async (payload) => {
 
 
 export const addReservation = async (payload) => {
-  let addReservationURL = `${reservationsAPIURL}/add/`;
-
-  const addReservationResponse = await FetchApiOnClient(addReservationURL, 'POST', payload);
+  const addReservationResponse = await FetchApiOnClient(reservationsAPIURL, 'POST', payload);
 
   if (addReservationResponse.error) { return upstreamErrorResponse(addReservationResponse) }
 
