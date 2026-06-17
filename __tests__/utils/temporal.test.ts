@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { calculateReservationTimes, dateDiffInMins, localiseDatetime } from '../../app/utils/temporal'
+import { calculateReservationTimes, dateDiffInMins, localiseUTCDatetime } from '../../app/utils/temporal'
 
 describe('temporal manipulation utilities', () => {
   it('should take a datetime and adjust for local timezone', () => {
@@ -7,9 +7,9 @@ describe('temporal manipulation utilities', () => {
     const resourceTimezone = 'Europe/Istanbul'
     const now = new Date('2026-06-01 15:38')
 
-    const localisedDatime = localiseDatetime(now, localTimezone, resourceTimezone)
+    const localisedDatime = localiseUTCDatetime(now, localTimezone)
 
-    expect(localisedDatime.toISOString()).toEqual('2026-06-01T16:38:00.000Z')
+    expect(localisedDatime.toISOString()).toEqual('2026-06-01T14:38:00.000Z')
   })
 
   it('should return the difference in minutes between to datetimes', () => {
@@ -25,13 +25,12 @@ describe('temporal manipulation utilities', () => {
     const startDate = new Date('2026-06-01 15:38')
     const endDate = new Date('2026-06-01 21:52')
     const localTimezone = 'Europe/Istanbul'
-    const resourceTimezone = 'America/Panama'
 
-    const calculatedValues = calculateReservationTimes(new Date(startDate), endDate, localTimezone, resourceTimezone);
+    const calculatedValues = calculateReservationTimes(new Date(startDate), new Date(endDate), localTimezone);
 
     expect(calculatedValues).toEqual({
-      localStartsAt: new Date('2026-06-01T11:38:00.000Z'),
-      localEndsAt: new Date('2026-06-01T17:52:00.000Z'),
+      localStartsAt: new Date('2026-06-01T14:38:00.000Z'),
+      localEndsAt: new Date('2026-06-01T20:52:00.000Z'),
       durationMinutes: 374,
     })
 

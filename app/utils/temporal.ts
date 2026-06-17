@@ -12,23 +12,22 @@ const intlDateTimeOptions: Intl.DateTimeFormatOptions = {
   minute: "numeric",
   second: "numeric",
   fractionalSecondDigits: 2,
-  timeZone: "UTC"
+  timeZone: "UTC",
+  timeZoneName: "longOffset",
 };
 
-export const calculateReservationTimes = (start: Date, end: Date, localTimezone: string, resourceTimezone: string): CalculatedReservationTimes => ({
-  localStartsAt: localiseDatetime(start, localTimezone, resourceTimezone),
-  localEndsAt: localiseDatetime(end, localTimezone, resourceTimezone),
+export const calculateReservationTimes = (start: Date, end: Date, localTimezone: string,): CalculatedReservationTimes => ({
+  localStartsAt: localiseUTCDatetime(start, localTimezone),
+  localEndsAt: localiseUTCDatetime(end, localTimezone),
   durationMinutes: dateDiffInMins(start, end)
 })
 
-export const localiseDatetime = (datetime: Date, localTimezone: string, resourceTimezone: string) => {
-  // console.log("🚀 ~ localiseDatetime ~ datetime, localTimezone, resourceTimezone:", datetime, localTimezone, resourceTimezone)
+export const localiseUTCDatetime = (datetime: Date, localTimezone: string) => {
   intlDateTimeOptions.timeZone = localTimezone;
 
-  const formatter = new Intl.DateTimeFormat('en-GB', intlDateTimeOptions)
-  const originalDate = new Date(datetime.toLocaleString('en-GB', {timeZone: resourceTimezone}))
+  const formatter = new Intl.DateTimeFormat('UTC', intlDateTimeOptions)
 
-  return new Date(formatter.format(originalDate))
+  return new Date(formatter.format(datetime))
 }
 
 export const dateDiffInMins = (startDate, endDate) => Math.abs(new Date(startDate).getTime() - new Date(endDate).getTime()) / 1000 / 60;

@@ -59,7 +59,7 @@ export const getSingleReservation = async (payload) => {
     errorResponseResourceId(reservationResponse.resourceId)
   }
 
-  const { localStartsAt, localEndsAt, durationMinutes }:CalculatedReservationTimes = calculateReservationTimes(new Date(reservationResponse.startsAt), new Date(reservationResponse.endsAt), payload.timezone, resourceResponse.timezone);
+  const { localStartsAt, localEndsAt, durationMinutes }:CalculatedReservationTimes = calculateReservationTimes(new Date(reservationResponse.startsAt), new Date(reservationResponse.endsAt), payload.timezone);
 
   hydratedReservationData = {
     ...reservationResponse,
@@ -91,7 +91,6 @@ export const getReservationsList = async (payload) => {
   }
 
   const reservationsResponse:ReservationsResponse = await FetchApiOnClient(reservationListURL, 'GET');
-  console.log("🚀 ~ getReservationsList ~ reservationsResponse:", reservationsResponse)
 
   if ((reservationsResponse as ApiError).error) { return upstreamErrorResponse(reservationsResponse) }
 
@@ -107,7 +106,7 @@ export const getReservationsList = async (payload) => {
       errorResponseResourceId(reservationItem.resourceId)
     }
 
-    const { localStartsAt, localEndsAt, durationMinutes } = calculateReservationTimes(reservationItem.startsAt, reservationItem.endsAt, payload.timezone, resourceResponse.timezone);
+    const { localStartsAt, localEndsAt, durationMinutes }:CalculatedReservationTimes = calculateReservationTimes(new Date(reservationItem.startsAt), new Date(reservationItem.endsAt), payload.timezone);
 
     const hydratedItem: HydratedReservationData = {
       ...reservationItem,
