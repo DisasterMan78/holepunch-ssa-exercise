@@ -24,4 +24,20 @@ describe('api fetch tests', () => {
         expect(error.message).toEqual('Failed to fetch data: 500 - Internal Server Error')
       })
   })
+
+  it('handles malformed JSON in response body', async () => {
+    server.use(
+      http.post(testSchedulingAPIURL, () => {
+        return new HttpResponse(`{
+          this: 'aint',
+          JSON:
+        }`, {status: 200})
+      }),
+    )
+
+    await FetchApiOnClient(testSchedulingAPIURL, 'POST', {})
+      .catch(error => {
+        expect(error.message).toEqual('The server responded with malformed JSON')
+      })
+  })
 })

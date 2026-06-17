@@ -2,6 +2,11 @@ import { ApiError } from "../../error";
 import { FetchApiOnClient } from "../../utils/fetch-api";
 import { CalculatedReservationTimes, calculateReservationTimes } from "../../utils/temporal";
 
+type ErrorResponse = {
+  error: number,
+  errorMessage: string,
+}
+
 type ResourceData = null | {
   id: number,
   name: string
@@ -92,7 +97,7 @@ export const getReservationsList = async (payload) => {
 
   const reservationsResponse:ReservationsResponse = await FetchApiOnClient(reservationListURL, 'GET');
 
-  if ((reservationsResponse as ApiError).error) { return upstreamErrorResponse(reservationsResponse) }
+  if ((reservationsResponse as ApiError).error) { return upstreamErrorResponse(reservationsResponse as ErrorResponse) }
 
   const reservationsArray = reservationsResponse as ReservationData[]
 
@@ -165,7 +170,7 @@ const errorResponseResourceId = (id) => {
 }
 
 
-const upstreamErrorResponse = (errorResponse) => new Response(JSON.stringify({
+const upstreamErrorResponse = (errorResponse: ErrorResponse) => new Response(JSON.stringify({
     error: errorResponse.error,
     errorMessage: `Upstream error: ${errorResponse.errorMessage}`
   }), {
