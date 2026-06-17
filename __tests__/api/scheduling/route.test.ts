@@ -69,6 +69,22 @@ describe('POST - scheduling-api', () => {
       expect(json.errorMessage).toEqual('Upstream error: Internal Server Error')
     })
 
+    it('returns 500 if the reservation API returns a malformed response', async () => {
+      const request = new NextRequest(new Request(testSchedulingAPIURL, {
+        method: 'POST',
+        body: JSON.stringify({
+          reservationId: 6,
+          timezone: 'Europe/Istanbul'})
+      }))
+      const response = await POST(request)
+      const contentType = response.headers.get('Content-Type')
+      const json = await response.json();
+
+      expect(response.status).toEqual(500)
+      expect(contentType).toEqual('application/json')
+      expect(json.errorMessage).toEqual('Upstream error: The server responded with malformed JSON')
+    })
+
     it('should read a single reservation in hydrated form and provide correctly adjusted local start and end times - POST /scheduling/', async () => {
       const request = new NextRequest(new Request(testSchedulingAPIURL, {
         method: 'POST',
