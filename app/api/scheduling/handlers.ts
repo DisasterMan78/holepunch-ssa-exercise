@@ -7,6 +7,10 @@ type ErrorResponse = {
   errorMessage: string,
 }
 
+type genericPayload = {
+   [key: string]: any;
+}
+
 export type ResourceData = {
   id: number,
   name: string
@@ -36,9 +40,9 @@ export type HydratedReservationData = null | ReservationData & ComputedReservati
 const catalogAPIURL = 'http://localhost:4040/';
 const reservationsAPIURL = 'http://localhost:5050/';
 
-export const getSingleReservation = async (payload) => {
+export const getSingleReservation = async (payload: genericPayload) => {
 
-  if (!payload.reservationId) {
+  if (payload.reservationId === undefined) {
     return new Response(JSON.stringify({
       error: 400,
       errorMessage: 'Invalid request body - no reservationId received'
@@ -85,7 +89,7 @@ export const getSingleReservation = async (payload) => {
 }
 
 
-export const getReservationsList = async (payload) => {
+export const getReservationsList = async (payload: genericPayload) => {
 
   let hydratedReservationsData: HydratedReservationData[] = [];
 
@@ -145,7 +149,7 @@ export const getReservationsList = async (payload) => {
 }
 
 
-export const addReservation = async (payload) => {
+export const addReservation = async (payload: genericPayload) => {
   const addReservationResponse = await FetchApiOnClient(reservationsAPIURL, 'POST', payload);
 
   if (addReservationResponse.error) { return upstreamErrorResponse(addReservationResponse) }
@@ -154,6 +158,24 @@ export const addReservation = async (payload) => {
     ...addReservationResponse,
   }), {
     status: 201,
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+
+export const replaceReservation = async (payload: genericPayload) => {
+  const reservationIdURL = `${reservationsAPIURL}${payload.reservationId}`;
+
+  const replaceReservationResponse = await FetchApiOnClient(reservationIdURL, 'PUT', payload);
+
+  if (replaceReservationResponse.error) {
+    return upstreamErrorResponse(replaceReservationResponse)
+  }
+
+  return new Response(JSON.stringify({
+    ...replaceReservationResponse,
+  }), {
+    status: 200,
     headers: { 'Content-Type': 'application/json' }
   });
 }

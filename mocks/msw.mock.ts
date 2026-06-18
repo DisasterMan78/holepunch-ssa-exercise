@@ -10,6 +10,7 @@ export const testCatalogAPIURL = 'http://localhost:4040/'
 export const testCatalogAPIgetURL = `${testCatalogAPIURL}:id`
 export const testReservationAPIURL = 'http://localhost:5050/'
 export const testReservationAPIgetURL = `${testReservationAPIURL}:id`
+export const testReservationAPIputURL = testReservationAPIgetURL
 
 export const testAPIResponse = {
   unbuiltAPI: true,
@@ -22,6 +23,7 @@ export const server = setupServer(
   http.post(testReservationAPIURL, ({ request }) => passthrough()),
   http.get(testReservationAPIgetURL, ({ request }) => passthrough()),
   http.get(testCatalogAPIgetURL, ({ request }) => passthrough()),
+  http.put(testReservationAPIputURL, ({ request }) => passthrough()),
 )
 
 beforeAll(() => server.listen({
