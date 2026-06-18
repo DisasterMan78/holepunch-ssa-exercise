@@ -7,7 +7,7 @@ type ErrorResponse = {
   errorMessage: string,
 }
 
-type ResourceData = null | {
+export type ResourceData = {
   id: number,
   name: string
   kind: string,
@@ -19,19 +19,19 @@ type ReservationData = {
   id: number,
   resourceId: number,
   holder: string, // Ideally a valid email type, but hard to do accurately. Arguably even basic email validation should happen as part of data sanitation, so a type is unnecessary. I'd probably use Regex for both, cos I'm sick like that
-  startsAt: Date,
-  endsAt:   Date,
+  startsAt: string,
+  endsAt:   string,
 }
 
 type ReservationsResponse = ReservationData[] | ApiError;
 
 type ComputedReservationData = {
-  localStartsAt: Date,
-  localEndsAt:   Date,
+  localStartsAt: string,
+  localEndsAt:   string,
   durationMinutes: Number,
 }
 
-export type HydratedReservationData = null | ReservationData & ComputedReservationData & { resource: ResourceData }
+export type HydratedReservationData = null | ReservationData & ComputedReservationData & { resource: ResourceData | undefined }
 
 const catalogAPIURL = 'http://localhost:4040/';
 const reservationsAPIURL = 'http://localhost:5050/';

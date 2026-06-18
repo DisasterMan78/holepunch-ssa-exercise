@@ -1,6 +1,8 @@
+import { CalendarDate } from '@internationalized/date';
+
 export type CalculatedReservationTimes = {
-  localStartsAt: Date,
-  localEndsAt: Date,
+  localStartsAt: string,
+  localEndsAt: string,
   durationMinutes: number,
 }
 
@@ -17,8 +19,8 @@ const intlDateTimeOptions: Intl.DateTimeFormatOptions = {
 };
 
 export const calculateReservationTimes = (start: Date, end: Date, localTimezone: string,): CalculatedReservationTimes => ({
-  localStartsAt: localiseUTCDatetime(start, localTimezone),
-  localEndsAt: localiseUTCDatetime(end, localTimezone),
+  localStartsAt: localiseUTCDatetime(start, localTimezone).toISOString(),
+  localEndsAt: localiseUTCDatetime(end, localTimezone).toISOString(),
   durationMinutes: dateDiffInMins(start, end)
 })
 

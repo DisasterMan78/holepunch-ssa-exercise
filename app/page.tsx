@@ -10,34 +10,39 @@ import { HydratedReservationData } from './api/scheduling/handlers';
 
 type ReservationOptions = {
   reservationId?: number
-}
+};
 
 type ListOptions = {
   resourceId?: number,
   paginationSize?: number,
   page?: number,
-}
+};
 
-type AddReservationOptions = {
+type AddOrReplaceReservationOptions = {
+  reservationId?: number,
   holder: string,
   resourceId: number,
   date: Date,
   startsAt: string,
   endsAt: string,
-}
+};
 
-type RequestOptions = ReservationOptions | ListOptions | AddReservationOptions;
+type RequestOptions = ReservationOptions | ListOptions | AddOrReplaceReservationOptions;
 
 const Home = () => {
   const [error, setError] = useState<null | ApiError>(null);
   const [dataIsLoading, setDataIsLoading] = useState(false);
+  const [listIsLoading, setListIsLoading] = useState(false);
   const [response, setResponse] = useState<HydratedReservationData | undefined>(undefined);
+  const [reservationsList, setReservationsList] = useState<HydratedReservationData[] | undefined>(undefined);
   const endpoints = {
     reservation: 'http://localhost:3000/api/scheduling/',
     list: 'http://localhost:3000/api/scheduling/list/',
     addReservation: 'http://localhost:3000/api/scheduling/add/',
+    replaceReservation: 'http://localhost:3000/api/scheduling/replace/',
   }
   let apiUrl = endpoints.reservation;
+
 
   const onSubmitFn = (event: SubmitEvent<HTMLFormElement>) => {
     setDataIsLoading(true);
@@ -45,12 +50,30 @@ const Home = () => {
     setError(null);
 
     const form = event.target
-
     const requestType = form.apiRequestType.value;
+
     let requestOptions: RequestOptions = {};
 
     const resetRequestOptions = () => {
       requestOptions = {}
+    }
+
+
+    const buildFullReservationFromFormData = (requestOptions, form) => {
+
+      const reservationEndDate = new Date(form.date.value);
+
+      (requestOptions as AddOrReplaceReservationOptions).holder = form.holder.value;
+      (requestOptions as AddOrReplaceReservationOptions).resourceId = form.resourceId.value;
+      (requestOptions as AddOrReplaceReservationOptions).startsAt = new Date(`${form.date.value} ${form.startsAt.value}`).toISOString();
+
+      if (form.startsAt.value > form.endsAt.value) {
+        reservationEndDate.setDate(reservationEndDate.getDate() + 1)
+      }
+
+      (requestOptions as AddOrReplaceReservationOptions).endsAt = new Date(`${reservationEndDate.getFullYear()}-${reservationEndDate.getMonth() + 1}-${reservationEndDate.getDate()} ${form.endsAt.value}`).toISOString();
+
+      return requestOptions;
     }
 
     switch (requestType) {
@@ -70,25 +93,25 @@ const Home = () => {
 
       case 'add':
         resetRequestOptions();
+        apiUrl = endpoints.addReservation;requestOptions = buildFullReservationFromFormData(requestOptions, form);
         apiUrl = endpoints.addReservation;
-        const reservationEndDate = new Date(form.date.value);
+      break;
 
-        (requestOptions as AddReservationOptions).holder = form.holder.value;
-        (requestOptions as AddReservationOptions).resourceId = form.resourceId.value;
-        (requestOptions as AddReservationOptions).startsAt = new Date(`${form.date.value} ${form.startsAt.value}`).toISOString();
+      case 'replace':
+        resetRequestOptions();
+        requestOptions = buildFullReservationFromFormData(requestOptions, form);
+        (requestOptions as AddOrReplaceReservationOptions).reservationId = form.reservationId.value;
+        apiUrl = endpoints.replaceReservation;
 
-        if (form.startsAt.value > form.endsAt.value) {
-          reservationEndDate.setDate(reservationEndDate.getDate() + 1)
-        }
-
-        (requestOptions as AddReservationOptions).endsAt = new Date(`${reservationEndDate.getFullYear()}-${reservationEndDate.getMonth() + 1}-${reservationEndDate.getDate()} ${form.endsAt.value}`).toISOString();
       break;
     }
+
 
     const payload = {
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       ...requestOptions
     };
+
 
     FetchApiOnClient(apiUrl, 'POST', payload)
       .catch(error => {
@@ -104,8 +127,33 @@ const Home = () => {
       });
   };
 
+  const fetchReservationsList = () => {
+    setListIsLoading(true);
+
+    const payload = {
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      requestOptions: {}
+    };
+
+    FetchApiOnClient(endpoints.list, 'POST', payload)
+      .catch(error => {
+        setError(error as ApiError);
+      })
+      .then((response: HydratedReservationData[] | ApiError) => {
+        if (response && 'error' in response) {
+          setError(response as ApiError);
+        } else {
+          setReservationsList(response);
+        }
+        setListIsLoading(false);
+      });
+  }
+
   const schedulingFormProps: SchedulingFormProps = {
-    onSubmitFn: onSubmitFn,
+    reservationsList,
+    onSubmitFn,
+    listIsLoading,
+    fetchReservationsList,
   }
 
   return (

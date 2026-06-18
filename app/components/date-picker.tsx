@@ -3,13 +3,18 @@
 import type {DateValue} from "@internationalized/date";
 
 import {Calendar, DateField, DatePicker, FieldError, Label} from "@heroui/react";
-import {getLocalTimeZone, today} from "@internationalized/date";
-import {useState} from "react";
+import {CalendarDate, getLocalTimeZone, today} from "@internationalized/date";
+import { useState } from "react";
 
-export function ValidatedDatePicker() {
-  const [value, setValue] = useState<DateValue | null>(null);
+type ValidatedDatePickerProps = {
+  initialDate?: Date,
+  validate?: boolean,
+}
+
+export function ValidatedDatePicker({initialDate, validate = true}: ValidatedDatePickerProps) {
+  const [value, setValue] = useState<DateValue | undefined>((initialDate && new CalendarDate(initialDate.getFullYear(), initialDate.getMonth() + 1, initialDate.getDay())) || undefined);
   const currentDate = today(getLocalTimeZone());
-  const isInvalid = value != null && value.compare(currentDate) < 0;
+  const isInvalid = validate ? value && value.compare(currentDate) < 0 : false;
 
   return (
     <DatePicker
@@ -19,7 +24,7 @@ export function ValidatedDatePicker() {
       minValue={currentDate}
       name="date"
       value={value}
-      onChange={setValue}
+      onChange={(date) => { date && setValue(date) }}
     >
       <Label>Reservation date</Label>
       <DateField.Group
