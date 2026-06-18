@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { addReservation, getReservationsList, getSingleReservation, noBodyErrorResponse, noPayloadErrorResponse, noTimezoneErrorResponse } from "../handlers";
+import { addReservation, getSingleReservation, noBodyErrorResponse, noPayloadErrorResponse, noTimezoneErrorResponse } from "../handlers";
 
 type ReservationRequest = {
   reservationId: number,

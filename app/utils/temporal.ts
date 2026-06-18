@@ -18,11 +18,11 @@ const intlDateTimeOptions: Intl.DateTimeFormatOptions = {
   timeZoneName: "longOffset",
 };
 
-export const calculateReservationTimes = (start: Date, end: Date, localTimezone: string,): CalculatedReservationTimes => ({
+export const calculateReservationTimes = (start: Date, end: Date, localTimezone: string): CalculatedReservationTimes => ({
   localStartsAt: localiseUTCDatetime(start, localTimezone).toISOString(),
   localEndsAt: localiseUTCDatetime(end, localTimezone).toISOString(),
   durationMinutes: dateDiffInMins(start, end)
-})
+});
 
 export const localiseUTCDatetime = (datetime: Date, localTimezone: string) => {
   intlDateTimeOptions.timeZone = localTimezone;
