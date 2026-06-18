@@ -2,7 +2,7 @@
 import { SubmitEvent, useState } from 'react';
 
 import { FetchApiOnClient } from './utils/fetch-api';
-import SchedulingForm, { SchedulingFormProps } from './components/scheduling-form';
+import SchedulingForm, { SchedulingFormProps } from './components/SchedulingForm';
 import {ApiError, default as ErrorUI} from './error';
 
 import styles from './page.module.css';

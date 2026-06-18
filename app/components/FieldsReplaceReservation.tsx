@@ -1,0 +1,66 @@
+import type { HydratedReservationData, ResourceData } from "../api/scheduling/handlers";
+
+import { JSX, useEffect, useState } from "react";
+import { Input, Label, TextField } from "@heroui/react";
+import {
+  ReservationSelector,
+  ResourceSelector,
+  TimeRange,
+  ValidatedDatePicker,
+} from ".";
+
+
+type ReplaceReservationInputsProps = {
+  reservationOptions: HydratedReservationData[] | undefined,
+  resourceOptions: ResourceData[],
+  selectedReservation: HydratedReservationData | undefined,
+  setReplacementReservation: (reservationIndex: number) => void
+}
+
+export const ReplaceReservationInputs = ({ reservationOptions, resourceOptions, selectedReservation, setReplacementReservation }: ReplaceReservationInputsProps): JSX.Element => {
+  const [holder, setHolder] = useState(selectedReservation?.holder);
+
+  useEffect(() => {
+    setHolder(selectedReservation?.holder);
+  }, [selectedReservation])
+
+  return (
+  <>
+    <ReservationSelector
+      reservationOptions={reservationOptions}
+      setReplacementReservation={setReplacementReservation}
+    />
+    {selectedReservation && (
+      <>
+        <TextField
+          isRequired
+          name="holder"
+          value={holder}
+          onChange={setHolder}
+        >
+          <Label
+            htmlFor="holder"
+          >Email address</Label>
+          <Input
+            type="email"
+            placeholder="jane@doe.com"
+          />
+        </TextField>
+        <ResourceSelector
+          initiallySelected={selectedReservation.id}
+          resourceOptions={resourceOptions}
+        />
+        <ValidatedDatePicker
+          initialDate={new Date(selectedReservation.localStartsAt)}
+          validate={false}
+        />
+        <br />
+        <TimeRange
+          startDate={selectedReservation.startsAt}
+          endDate={selectedReservation.endsAt}
+          timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}
+        />
+      </>
+    )}
+  </>
+)}

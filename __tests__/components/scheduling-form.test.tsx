@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { userEvent } from 'vitest/browser'
 
-import SchedulingForm, { SchedulingFormProps } from '../../app/components/scheduling-form'
+import SchedulingForm, { SchedulingFormProps } from '../../app/components/SchedulingForm'
 
 const onSubmitMock = vi.fn(e => e.preventDefault);
 

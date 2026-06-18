@@ -1,13 +1,13 @@
-import { ChangeEvent, JSX, SubmitEvent, useEffect, useState } from "react";
+import type { HydratedReservationData } from "../api/scheduling/handlers";
+
+import { ChangeEvent, SubmitEvent, useState } from "react";
+
+import { catalogResources } from "../api/catalog-resources";
+import {
+  AddReservationInputs, ListReservationsInputs, ReplaceReservationInputs, SingleReservationInputs
+} from "./fieldsets";
 
 import styles from '../page.module.css';
-import { ValidatedDatePicker } from "./date-picker";
-import { TimeRange } from "./time-range";
-import { catalogResources } from "../api/catalog-resources";
-import { ResourceSelector } from "./resource-selector";
-import { Input, Label, TextField } from "@heroui/react";
-import { HydratedReservationData, ResourceData } from "../api/scheduling/handlers";
-import { ReservationSelector } from "./reservation-selector";
 
 export type SchedulingFormProps = {
   reservationsList: HydratedReservationData[] | undefined,
@@ -15,13 +15,6 @@ export type SchedulingFormProps = {
   listIsLoading: boolean,
   onSubmitFn: (event: SubmitEvent<HTMLFormElement>) => void,
 };
-
-type ReplaceReservationInputsProps = {
-  reservationOptions: HydratedReservationData[] | undefined,
-  resourceOptions: ResourceData[],
-  selectedReservation: HydratedReservationData | undefined,
-  setReplacementReservation: (reservationIndex: number) => void
-}
 
 const SchedulingForm = ({ reservationsList, fetchReservationsList, listIsLoading, onSubmitFn }: SchedulingFormProps) => {
   const [showSingleOption, setShowSingleOption] = useState(false);
@@ -124,6 +117,7 @@ const SchedulingForm = ({ reservationsList, fetchReservationsList, listIsLoading
             <SingleReservationInputs
               reservationId={reservationId}
               setReservationId={setReservationId}
+              styles={styles}
             />
           )}
           {showListOptions && (
@@ -134,6 +128,7 @@ const SchedulingForm = ({ reservationsList, fetchReservationsList, listIsLoading
               setPaginationSize={setPaginationSize}
               page={page}
               setPage={setPage}
+              styles={styles}
             />
           )}
           {showAddOptions && (
@@ -160,146 +155,5 @@ const SchedulingForm = ({ reservationsList, fetchReservationsList, listIsLoading
     </form>
   )
 };
-
-
-const SingleReservationInputs = ({reservationId, setReservationId}) => (
-  <>
-    <TextField>
-      <Label htmlFor="reservationId">
-        Reservation ID
-      </Label>
-      <Input
-        type="number"
-        placeholder="id"
-        name="reservationId"
-        value={reservationId}
-        className={`${styles.idInput} border border-2 rounded-md`}
-        onChange={(e) => setReservationId(e.target.value)}
-      />
-    </TextField>
-  </>
-)
-
-
-const ListReservationsInputs = ({resourceId, setResourceId, paginationSize, setPaginationSize, page, setPage}): JSX.Element => (
-  <>
-    <TextField>
-      <label htmlFor="resourceId">
-        Resource ID
-      </label>
-      <Input
-        type="number"
-        placeholder="id"
-        id="resourceId"
-        name="resourceId"
-        value={resourceId}
-        className={`${styles.idInput} border border-2 rounded-md`}
-        onChange={(e) => setResourceId(e.target.value)}
-      />
-    </TextField>
-    <TextField>
-      <Label htmlFor="paginationSize">
-        Pagination size
-      </Label>
-      <Input
-        type="number"
-        placeholder="#"
-        name="paginationSize"
-        min="1"
-        value={paginationSize}
-        className={`${styles.idInput} border border-2 rounded-md`}
-        onChange={(e) => setPaginationSize(e.target.value)}
-      />
-    </TextField>
-    <TextField>
-      <Label htmlFor="page">
-        Page #
-      </Label>
-      <Input
-        type="number"
-        placeholder="#"
-        name="page"
-        min="1"
-        value={page}
-        className={`${styles.idInput} border border-2 rounded-md`}
-        onChange={(e) => setPage(e.target.value)}
-      />
-    </TextField>
-  </>
-)
-
-
-const AddReservationInputs = ({resourceOptions}) => (
-  <>
-    <TextField
-      isRequired
-    >
-      <Label
-        htmlFor="holder"
-      >Email address</Label>
-      <Input
-        type="email"
-        name="holder"
-        placeholder="jane@doe.com"
-      />
-    </TextField>
-    <ResourceSelector
-      initiallySelected={undefined}
-      resourceOptions={resourceOptions}
-    />
-    <ValidatedDatePicker />
-    <br />
-    <TimeRange />
-  </>
-)
-
-
-const ReplaceReservationInputs = ({ reservationOptions, resourceOptions, selectedReservation, setReplacementReservation }: ReplaceReservationInputsProps) => {
-  const [holder, setHolder] = useState(selectedReservation?.holder);
-
-  useEffect(() => {
-    setHolder(selectedReservation?.holder);
-  }, [selectedReservation])
-
-  return (
-  <>
-    <ReservationSelector
-      reservationOptions={reservationOptions}
-      setReplacementReservation={setReplacementReservation}
-    />
-    {selectedReservation && (
-      <>
-        <TextField
-          isRequired
-          name="holder"
-          value={holder}
-          onChange={setHolder}
-        >
-          <Label
-            htmlFor="holder"
-          >Email address</Label>
-          <Input
-            type="email"
-            placeholder="jane@doe.com"
-          />
-        </TextField>
-        <ResourceSelector
-          initiallySelected={selectedReservation.id}
-          resourceOptions={resourceOptions}
-        />
-        <ValidatedDatePicker
-          initialDate={new Date(selectedReservation.localStartsAt)}
-          validate={false}
-        />
-        <br />
-        <TimeRange
-          startDate={selectedReservation.startsAt}
-          endDate={selectedReservation.endsAt}
-          timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}
-        />
-      </>
-    )}
-  </>
-)}
 
 export default SchedulingForm;
