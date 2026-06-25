@@ -68,45 +68,47 @@ const SchedulingForm = ({ reservationsList, fetchReservationsList, listIsLoading
       onSubmit={(e: SubmitEvent<HTMLFormElement>) => { e.preventDefault(); onSubmitFn(e) }}
     >
       <h2>Scheduling Form</h2>
-      <fieldset>
+      <fieldset
+        className={styles.radioTabs}
+      >
+        <input
+          type="radio"
+          name="apiRequestType"
+          id="api-request-reservation"
+          value="reservation"
+          onChange={(e) => showFieldOptions(e)}
+        />
         <label htmlFor="api-request-reservation">
-          <input
-            type="radio"
-            name="apiRequestType"
-            id="api-request-reservation"
-            value="reservation"
-            onChange={(e) => showFieldOptions(e)}
-          />
           Single Reservation
         </label>
+        <input
+          type="radio"
+          name="apiRequestType"
+          id="apiRequestList"
+          value="list"
+          onChange={(e) => showFieldOptions(e)}
+        />
         <label htmlFor="apiRequestList">
-          <input
-            type="radio"
-            name="apiRequestType"
-            id="apiRequestList"
-            value="list"
-            onChange={(e) => showFieldOptions(e)}
-          />
           List Reservations
         </label>
+        <input
+          type="radio"
+          name="apiRequestType"
+          id="apiRequestAdd"
+          value="add"
+          onChange={(e) => showFieldOptions(e)}
+        />
         <label htmlFor="apiRequestAdd">
-          <input
-            type="radio"
-            name="apiRequestType"
-            id="apiRequestAdd"
-            value="add"
-            onChange={(e) => showFieldOptions(e)}
-          />
           Add Reservation
         </label>
+        <input
+          type="radio"
+          name="apiRequestType"
+          id="apiRequestReplace"
+          value="replace"
+          onChange={(e) => showFieldOptions(e)}
+        />
         <label htmlFor="apiRequestReplace">
-          <input
-            type="radio"
-            name="apiRequestType"
-            id="apiRequestReplace"
-            value="replace"
-            onChange={(e) => showFieldOptions(e)}
-          />
           Replace Reservation
         </label>
       </fieldset>

@@ -108,6 +108,36 @@ a.secondary {
   flex-shrink: 0;
 }
 
+.radioTabs input[type="radio"] {
+  display: none;
+}
+
+.radioTabs label {
+  position: relative;
+  float: left;
+  min-width: 100px;
+  padding-left: 10px;
+  padding-right: 10px;
+  background: #ccc;
+  text-align: left;
+  cursor: pointer;
+  border: solid 1px #888;
+  border-bottom-width: 0;
+  border-radius: 5px 5px 0 0;
+  z-index: 10;
+}
+
+.radioTabs input[type="radio"]:checked + label {
+  background-color: #eee;
+}
+
+.fieldComponents {
+  border: solid 1px #888;
+  border-top-width: 0;
+  padding: 20px;
+
+}
+
 .idInput {
   width: 100px;
 }
