@@ -1,6 +1,7 @@
 import type { HydratedReservationData, ResourceData } from "../api/scheduling/handlers";
+import type { PatchReservationOptions } from "../page";
 
-import { JSX, useEffect, useState } from "react";
+import { Dispatch, JSX, SetStateAction, useEffect, useState } from "react";
 import { Input, Label, TextField } from "@heroui/react";
 import {
   ReservationSelector,
@@ -10,14 +11,14 @@ import {
 } from ".";
 
 
-type ReplaceReservationInputsProps = {
+type PatchReservationInputsProps = {
   reservationOptions: HydratedReservationData[] | undefined,
   resourceOptions: ResourceData[],
   selectedReservation: HydratedReservationData | undefined,
-  setReplacementData?: (reservationIndex: number) => void,
-};
+  setPatchData?: (reservationIndex: number) => void,
+}
 
-export const ReplaceReservationInputs = ({ reservationOptions, resourceOptions, selectedReservation, setReplacementData }: ReplaceReservationInputsProps): JSX.Element => {
+export const PatchReservationInputs = ({ reservationOptions, resourceOptions, selectedReservation, setPatchData }: PatchReservationInputsProps): JSX.Element => {
   const [holder, setHolder] = useState(selectedReservation?.holder);
 
   useEffect(() => {
@@ -28,7 +29,7 @@ export const ReplaceReservationInputs = ({ reservationOptions, resourceOptions, 
   <>
     <ReservationSelector
       reservationOptions={reservationOptions}
-      setReplacementData={setReplacementData}
+      setReplacementData={setPatchData}
     />
     {selectedReservation && (
       <>
@@ -47,7 +48,7 @@ export const ReplaceReservationInputs = ({ reservationOptions, resourceOptions, 
           />
         </TextField>
         <ResourceSelector
-          initiallySelected={selectedReservation.id}
+          initiallySelected={selectedReservation.resourceId}
           resourceOptions={resourceOptions}
         />
         <ValidatedDatePicker

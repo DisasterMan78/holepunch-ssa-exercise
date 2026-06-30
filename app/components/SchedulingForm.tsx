@@ -1,37 +1,48 @@
 import type { HydratedReservationData } from "../api/scheduling/handlers";
+import type {
+  OnSubmitFn,
+  PatchReservationOptions
+} from "../page";
 
-import { ChangeEvent, SubmitEvent, useState } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, SubmitEvent, useState } from "react";
 
 import { catalogResources } from "../api/catalog-resources";
 import {
-  AddReservationInputs, ListReservationsInputs, ReplaceReservationInputs, SingleReservationInputs
+  AddReservationInputs,
+  ListReservationsInputs,
+  ReplaceReservationInputs,
+  SingleReservationInputs,
+  PatchReservationInputs,
 } from "./fieldsets";
 
 import styles from '../page.module.css';
 
 export type SchedulingFormProps = {
   reservationsList: HydratedReservationData[] | undefined,
+  selectedReservation: HydratedReservationData | undefined;
+  setSelectedReservation: Dispatch<SetStateAction<HydratedReservationData | undefined>>,
   fetchReservationsList: () => void,
   listIsLoading: boolean,
-  onSubmitFn: (event: SubmitEvent<HTMLFormElement>) => void,
+  onSubmitFn: OnSubmitFn,
 };
 
-const SchedulingForm = ({ reservationsList, fetchReservationsList, listIsLoading, onSubmitFn }: SchedulingFormProps) => {
+const SchedulingForm = ({ reservationsList, fetchReservationsList, listIsLoading, onSubmitFn, selectedReservation, setSelectedReservation }: SchedulingFormProps) => {
   const [showSingleOption, setShowSingleOption] = useState(false);
   const [showListOptions, setShowListOptions] = useState(false);
   const [showAddOptions, setShowAddOptions] = useState(false);
   const [showReplaceOptions, setShowReplaceOptions] = useState(false);
+  const [showPatchOptions, setShowPatchOptions] = useState(false);
   const [reservationId, setReservationId] = useState('1');
   const [resourceId, setResourceId] = useState('');
   const [paginationSize, setPaginationSize] = useState('');
   const [page, setPage] = useState('');
-  const [selectedReservation, setSelectedReservation] = useState<HydratedReservationData | undefined>(undefined);
 
   const resetOptions = () => {
     setShowSingleOption(false);
     setShowListOptions(false);
     setShowAddOptions(false);
-    setShowReplaceOptions(false)
+    setShowReplaceOptions(false);
+    setShowPatchOptions(false);
   }
 
   const showFieldOptions = (event: ChangeEvent<HTMLInputElement>) => {
@@ -53,11 +64,15 @@ const SchedulingForm = ({ reservationsList, fetchReservationsList, listIsLoading
         setShowReplaceOptions(true);
         fetchReservationsList()
         break;
+      case 'patch':
+        setShowPatchOptions(true);
+        fetchReservationsList()
+        break;
     }
 
   }
 
-  const setReplacementReservation = (reservationIndex: number) => {
+  const setReplacementData = (reservationIndex: number) => {
     reservationsList && setSelectedReservation(reservationsList[reservationIndex])
   }
 
@@ -111,9 +126,19 @@ const SchedulingForm = ({ reservationsList, fetchReservationsList, listIsLoading
         <label htmlFor="apiRequestReplace">
           Replace Reservation
         </label>
+        <input
+          type="radio"
+          name="apiRequestType"
+          id="apiRequestPatch"
+          value="patch"
+          onChange={(e) => showFieldOptions(e)}
+        />
+        <label htmlFor="apiRequestPatch">
+          Patch Reservation
+        </label>
       </fieldset>
-      <br />
-      {!listIsLoading && (
+      <fieldset className={styles.fieldComponents}>
+        {!listIsLoading && (
         <>
           {showSingleOption && (
             <SingleReservationInputs
@@ -143,17 +168,26 @@ const SchedulingForm = ({ reservationsList, fetchReservationsList, listIsLoading
               reservationOptions={reservationsList}
               resourceOptions={catalogResources}
               selectedReservation={selectedReservation}
-              setReplacementReservation={setReplacementReservation}
+              setReplacementData={setReplacementData}
+            />
+          )}
+          {showPatchOptions && (
+            <PatchReservationInputs
+              reservationOptions={reservationsList}
+              resourceOptions={catalogResources}
+              selectedReservation={selectedReservation}
+              setPatchData={setReplacementData}
             />
           )}
           <br />
           <br />
           <button className="button border border-2">Submit POST request to Scheduling API</button>
         </>
-      )}
-      {listIsLoading && (
-        <h3>Form data loading...</h3>
-      )}
+        )}
+        {listIsLoading && (
+          <h3>Form data loading...</h3>
+        )}
+      </fieldset>
     </form>
   )
 };
