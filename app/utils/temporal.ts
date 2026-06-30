@@ -12,24 +12,24 @@ const intlDateTimeOptions: Intl.DateTimeFormatOptions = {
   day: "2-digit",
   hour: "numeric",
   minute: "numeric",
-  second: "numeric",
-  fractionalSecondDigits: 2,
+  second: "2-digit",
+  fractionalSecondDigits: undefined,
   timeZone: "UTC",
   timeZoneName: "longOffset",
 };
 
 export const calculateReservationTimes = (start: Date, end: Date, localTimezone: string): CalculatedReservationTimes => ({
-  localStartsAt: localiseUTCDatetime(start, localTimezone).toISOString(),
-  localEndsAt: localiseUTCDatetime(end, localTimezone).toISOString(),
+  localStartsAt: localiseUTCDatetime(start, localTimezone).toISOString().replace('.000Z', 'Z'),
+  localEndsAt: localiseUTCDatetime(end, localTimezone).toISOString().replace('.000Z', 'Z'),
   durationMinutes: dateDiffInMins(start, end)
 });
 
 export const localiseUTCDatetime = (datetime: Date, localTimezone: string) => {
   intlDateTimeOptions.timeZone = localTimezone;
 
-  const formatter = new Intl.DateTimeFormat('UTC', intlDateTimeOptions)
+  const formatter = new Intl.DateTimeFormat('UTC', intlDateTimeOptions);
 
-  return new Date(formatter.format(datetime))
+  return new Date(formatter.format(datetime));
 }
 
 export const dateDiffInMins = (startDate, endDate) => Math.abs(new Date(startDate).getTime() - new Date(endDate).getTime()) / 1000 / 60;

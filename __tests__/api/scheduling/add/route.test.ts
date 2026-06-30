@@ -43,8 +43,8 @@ describe('POST - scheduling-api', () => {
         timezone: "Europe/London",
         holder: "dmbenson1978@gmail.com",
         resourceId: 5,
-        startsAt: "2026-06-30T11:05:00.000Z",
-        endsAt: "2026-06-30T14:03:00.000Z"
+        startsAt: "2026-06-30T11:05:00Z",
+        endsAt: "2026-06-30T14:03:00Z"
       })
     }))
     const response = await POST(request)
@@ -56,8 +56,8 @@ describe('POST - scheduling-api', () => {
     expect(json.id).toBeTruthy()
     expect(json.resourceId).toEqual(5)
     expect(json.holder).toEqual("dmbenson1978@gmail.com")
-    expect(json.startsAt).toEqual("2026-06-30T11:05:00.000Z")
-    expect(json.endsAt).toEqual("2026-06-30T14:03:00.000Z")
+    expect(json.startsAt).toEqual("2026-06-30T11:05:00Z")
+    expect(json.endsAt).toEqual("2026-06-30T14:03:00Z")
   })
 
 
@@ -68,8 +68,8 @@ describe('POST - scheduling-api', () => {
         timezone: 'Antarctica/Davis',
         holder: 'dmbenson1978@gmail.com',
         resourceId: 3,
-        startsAt: '2026-06-12T11:05:00.000Z',
-        endsAt: '2026-06-12T14:03:00.000Z'
+        startsAt: '2026-06-12T11:05:00Z',
+        endsAt: '2026-06-12T14:03:00Z'
       })
     }))
     const addResponse = await POST(addRequest)
@@ -91,8 +91,8 @@ describe('POST - scheduling-api', () => {
         id: addedJson.id,
         resourceId: 3,
         holder: 'dmbenson1978@gmail.com',
-        startsAt: '2026-06-12T11:05:00.000Z',
-        endsAt: '2026-06-12T14:03:00.000Z',
+        startsAt: '2026-06-12T11:05:00Z',
+        endsAt: '2026-06-12T14:03:00Z',
         resource: {
           id: 3,
           name: 'Van #4',
@@ -100,8 +100,8 @@ describe('POST - scheduling-api', () => {
           capacity: 9,
           timezone: 'America/New_York'
         },
-        localStartsAt: '2026-06-12T11:05:00.000Z',
-        localEndsAt: '2026-06-12T14:03:00.000Z',
+        localStartsAt: '2026-06-12T11:05:00Z',
+        localEndsAt: '2026-06-12T14:03:00Z',
         durationMinutes: 178
       })
     } else {

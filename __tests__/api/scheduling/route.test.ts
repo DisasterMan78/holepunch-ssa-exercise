@@ -112,8 +112,8 @@ describe('POST - scheduling-api', () => {
         capacity: 8,
         timezone: 'Europe/Lisbon'
       },
-      localStartsAt: "2026-06-01T09:00:00.000Z",
-      localEndsAt: "2026-06-01T10:00:00.000Z",
+      localStartsAt: "2026-06-01T09:00:00Z",
+      localEndsAt: "2026-06-01T10:00:00Z",
       durationMinutes: 60
     })
   })

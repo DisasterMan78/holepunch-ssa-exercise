@@ -29,8 +29,8 @@ describe('temporal manipulation utilities', () => {
     const calculatedValues = calculateReservationTimes(new Date(startDate), new Date(endDate), localTimezone);
 
     expect(calculatedValues).toEqual({
-      localStartsAt: '2026-06-01T14:38:00.000Z',
-      localEndsAt: '2026-06-01T20:52:00.000Z',
+      localStartsAt: '2026-06-01T14:38:00Z',
+      localEndsAt: '2026-06-01T20:52:00Z',
       durationMinutes: 374,
     })
 

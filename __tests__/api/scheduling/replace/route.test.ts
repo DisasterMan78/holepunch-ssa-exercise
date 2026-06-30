@@ -45,8 +45,8 @@ describe('POST - scheduling-api', () => {
         timezone: "Europe/London",
         holder: "dmbenson1978@gmail.com",
         resourceId: 5,
-        startsAt: "2026-06-30T11:05:00.000Z",
-        endsAt: "2026-06-30T14:03:00.000Z"
+        startsAt: "2026-06-30T11:05:00Z",
+        endsAt: "2026-06-30T14:03:00Z"
       })
     }))
     const response = await POST(request)
@@ -57,11 +57,11 @@ describe('POST - scheduling-api', () => {
     expect(contentType).toEqual('application/json')
 
     expect(json).toEqual({
-      endsAt: "2026-06-30T14:03:00.000Z",
+      endsAt: "2026-06-30T14:03:00Z",
       holder: "dmbenson1978@gmail.com",
       id: 1,
       resourceId: 5,
-      startsAt: "2026-06-30T11:05:00.000Z",
+      startsAt: "2026-06-30T11:05:00Z",
     })
   })
 
@@ -82,8 +82,8 @@ describe('POST - scheduling-api', () => {
       id: 1,
       resourceId: 5,
       holder: 'dmbenson1978@gmail.com',
-      startsAt: '2026-06-30T11:05:00.000Z',
-      endsAt: '2026-06-30T14:03:00.000Z',
+      startsAt: '2026-06-30T11:05:00Z',
+      endsAt: '2026-06-30T14:03:00Z',
       resource: {
         id: 5,
         name: 'Conference Room B',
@@ -91,8 +91,8 @@ describe('POST - scheduling-api', () => {
         capacity: 12,
         timezone: 'Europe/Lisbon'
       },
-      localStartsAt: '2026-06-30T11:05:00.000Z',
-      localEndsAt: '2026-06-30T14:03:00.000Z',
+      localStartsAt: '2026-06-30T11:05:00Z',
+      localEndsAt: '2026-06-30T14:03:00Z',
       durationMinutes: 178
     })
   })
