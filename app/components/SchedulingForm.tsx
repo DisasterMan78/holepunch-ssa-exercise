@@ -1,7 +1,6 @@
 import type { HydratedReservationData } from "../api/scheduling/handlers";
 import type {
   OnSubmitFn,
-  PatchReservationOptions
 } from "../page";
 
 import { ChangeEvent, Dispatch, SetStateAction, SubmitEvent, useState } from "react";
@@ -26,47 +25,24 @@ export type SchedulingFormProps = {
   onSubmitFn: OnSubmitFn,
 };
 
+type FormFieldSets = 'reservation' | 'list' | 'add' | 'replace' | 'patch';
+
 const SchedulingForm = ({ reservationsList, fetchReservationsList, listIsLoading, onSubmitFn, selectedReservation, setSelectedReservation }: SchedulingFormProps) => {
-  const [showSingleOption, setShowSingleOption] = useState(false);
-  const [showListOptions, setShowListOptions] = useState(false);
-  const [showAddOptions, setShowAddOptions] = useState(false);
-  const [showReplaceOptions, setShowReplaceOptions] = useState(false);
-  const [showPatchOptions, setShowPatchOptions] = useState(false);
+  const [showFields, setShowFields] = useState<FormFieldSets>('reservation');
   const [reservationId, setReservationId] = useState('1');
   const [resourceId, setResourceId] = useState('');
   const [paginationSize, setPaginationSize] = useState('');
   const [page, setPage] = useState('');
 
-  const resetOptions = () => {
-    setShowSingleOption(false);
-    setShowListOptions(false);
-    setShowAddOptions(false);
-    setShowReplaceOptions(false);
-    setShowPatchOptions(false);
-  }
-
   const showFieldOptions = (event: ChangeEvent<HTMLInputElement>) => {
     const selected = event.target.value;
 
-    resetOptions();
+    setShowFields(selected as FormFieldSets);
 
     switch (selected) {
-      case 'reservation':
-        setShowSingleOption(true);
-      break;
-      case 'list':
-        setShowListOptions(true);
-      break;
-      case 'add':
-        setShowAddOptions(true);
-        break;
       case 'replace':
-        setShowReplaceOptions(true);
-        fetchReservationsList()
-        break;
       case 'patch':
-        setShowPatchOptions(true);
-        fetchReservationsList()
+        fetchReservationsList();
         break;
     }
 
@@ -140,14 +116,14 @@ const SchedulingForm = ({ reservationsList, fetchReservationsList, listIsLoading
       <fieldset className={styles.fieldComponents}>
         {!listIsLoading && (
         <>
-          {showSingleOption && (
+          {showFields === 'reservation' && (
             <SingleReservationInputs
               reservationId={reservationId}
               setReservationId={setReservationId}
               styles={styles}
             />
           )}
-          {showListOptions && (
+          {showFields === 'list' && (
             <ListReservationsInputs
               resourceId={resourceId}
               setResourceId={setResourceId}
@@ -158,12 +134,12 @@ const SchedulingForm = ({ reservationsList, fetchReservationsList, listIsLoading
               styles={styles}
             />
           )}
-          {showAddOptions && (
+          {showFields === 'add' && (
             <AddReservationInputs
               resourceOptions={catalogResources}
             />
           )}
-          {showReplaceOptions && (
+          {showFields === 'replace' && (
             <ReplaceReservationInputs
               reservationOptions={reservationsList}
               resourceOptions={catalogResources}
@@ -171,7 +147,7 @@ const SchedulingForm = ({ reservationsList, fetchReservationsList, listIsLoading
               setReplacementData={setReplacementData}
             />
           )}
-          {showPatchOptions && (
+          {showFields === 'patch' && (
             <PatchReservationInputs
               reservationOptions={reservationsList}
               resourceOptions={catalogResources}
