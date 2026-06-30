@@ -3,13 +3,13 @@ import { describe, expect, it } from 'vitest'
 import { NextRequest } from 'next/server'
 
 import { POST } from '../../../../app/api/scheduling/replace/route'
-import { testSchedulingAddAPIURL, testSchedulingAPIURL } from '../../../../mocks/msw.mock'
+import { testSchedulingReplaceAPIURL, testSchedulingAPIURL } from '../../../../mocks/msw.mock'
 
 
 describe('POST - scheduling-api', () => {
 
   it('should return 400 if the JSON is not present', async () => {
-    const request = new NextRequest(new Request(testSchedulingAddAPIURL, {
+    const request = new NextRequest(new Request(testSchedulingReplaceAPIURL, {
       method: 'POST',
     }))
     const response = await POST(request)
@@ -23,7 +23,7 @@ describe('POST - scheduling-api', () => {
 
 
   it('should return 400 if the payload is not present', async () => {
-    const request = new NextRequest(new Request(testSchedulingAddAPIURL, {
+    const request = new NextRequest(new Request(testSchedulingReplaceAPIURL, {
       method: 'POST',
       body: JSON.stringify({})
     }))
@@ -38,7 +38,7 @@ describe('POST - scheduling-api', () => {
 
 
   it('should replace a reservation POST /scheduling/replace/', async () => {
-    const request = new NextRequest(new Request(testSchedulingAddAPIURL, {
+    const request = new NextRequest(new Request(testSchedulingReplaceAPIURL, {
       method: 'POST',
       body: JSON.stringify({
         reservationId: 1,
@@ -57,11 +57,11 @@ describe('POST - scheduling-api', () => {
     expect(contentType).toEqual('application/json')
 
     expect(json).toEqual({
-      endsAt: "2026-06-30T14:03:00Z",
-      holder: "dmbenson1978@gmail.com",
       id: 1,
       resourceId: 5,
+      holder: "dmbenson1978@gmail.com",
       startsAt: "2026-06-30T11:05:00Z",
+      endsAt: "2026-06-30T14:03:00Z",
     })
   })
 
@@ -98,13 +98,13 @@ describe('POST - scheduling-api', () => {
   })
 
   it('should reset record 1 so other tests don\'t break', async () => {
-    const request = new NextRequest(new Request(testSchedulingAddAPIURL, {
+    const request = new NextRequest(new Request(testSchedulingReplaceAPIURL, {
       method: 'POST',
       body: JSON.stringify({
         reservationId: 1,
-        timezone: "Europe/London",
-        holder: "alice@example.com",
         resourceId: 1,
+        holder: "alice@example.com",
+        timezone: "Europe/London",
         startsAt: "2026-06-01T09:00:00Z",
         endsAt: "2026-06-01T10:00:00Z"
       })
@@ -115,6 +115,12 @@ describe('POST - scheduling-api', () => {
 
     expect(response.status).toEqual(200)
     expect(contentType).toEqual('application/json')
-    expect(json.id).toEqual(1)
+    expect(json).toEqual({
+      id: 1,
+      resourceId: 1,
+      holder: "alice@example.com",
+      startsAt: "2026-06-01T09:00:00Z",
+      endsAt: "2026-06-01T10:00:00Z"
+    })
   })
 })
