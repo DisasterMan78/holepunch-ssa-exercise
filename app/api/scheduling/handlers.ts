@@ -181,6 +181,27 @@ export const replaceReservation = async (payload: genericPayload) => {
 }
 
 
+export const patchReservation = async (payload: genericPayload) => {
+  const reservationIdURL = `${reservationsAPIURL}${payload.reservationId}`;
+
+  delete payload.reservationId;
+  delete payload.timezone;
+
+  const patchReservationResponse = await FetchApiOnClient(reservationIdURL, 'PATCH', payload);
+
+  if (patchReservationResponse.error) {
+    return upstreamErrorResponse(patchReservationResponse)
+  }
+
+  return new Response(JSON.stringify({
+    ...patchReservationResponse,
+  }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+
 const errorResponseResourceId = (id) => {
   return new Response(JSON.stringify({
     name: 500,

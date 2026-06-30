@@ -1,6 +1,6 @@
 import { isValidJson } from "./validation/json-validator";
 
-type Methods = 'GET' | 'POST' | 'PUT';
+type Methods = 'GET' | 'POST' | 'PUT' | 'PATCH';
 
 type FetchInit = {
   method: Methods;
@@ -21,7 +21,7 @@ export const FetchApiOnClient = async (apiURL: string, method: Methods, payload?
     },
   }
 
-  if (method === 'POST' || method === 'PUT') {
+  if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
     fetchInit.body = JSON.stringify(payload);
   }
 
