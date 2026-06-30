@@ -1,10 +1,8 @@
+import type { ReservationRequest } from "../route";
+
 import { NextRequest } from "next/server";
 import { addReservation, getSingleReservation, noBodyErrorResponse, noPayloadErrorResponse, noTimezoneErrorResponse } from "../handlers";
 
-type ReservationRequest = {
-  reservationId: number,
-  timezone: string,
-}
 
 export const POST = async (request: NextRequest) => {
 

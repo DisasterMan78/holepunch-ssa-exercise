@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 
 import { getSingleReservation, noBodyErrorResponse, noPayloadErrorResponse, noTimezoneErrorResponse } from "./handlers";
 
-type ReservationRequest = {
+export type ReservationRequest = {
   reservationId: number,
   timezone: string,
 }
