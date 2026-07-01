@@ -103,6 +103,7 @@ describe('POST - scheduling-api - patch', () => {
       body: JSON.stringify({
         reservationId: 1,
         timezone: "Europe/London",
+        resourceId: 1,
         holder: "alice@example.com",
       })
     }))
@@ -116,7 +117,7 @@ describe('POST - scheduling-api - patch', () => {
       endsAt: "2026-06-30T14:03:00Z",
       holder: "alice@example.com",
       id: 1,
-      resourceId: 5,
+      resourceId: 1,
       startsAt: "2026-06-30T11:05:00Z",
     })
   })

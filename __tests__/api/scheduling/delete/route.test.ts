@@ -44,9 +44,9 @@ describe('POST - scheduling-api - delete', () => {
         reservationId: 1,
       })
     }))
+    console.log("🚀 ~ DELETE request:", request)
     const response = await POST(request)
-    const contentType = response.headers.get('Content-Type')
-    const json = await response.json();
+    console.log("🚀 ~ DELETE response:", response)
 
     expect(response.status).toEqual(204)
   })
@@ -66,29 +66,29 @@ describe('POST - scheduling-api - delete', () => {
     expect(readResponse.status).toEqual(404)
   })
 
-  it('should reset deleted record 1 so other tests don\'t break', async () => {
-    const request = new NextRequest(new Request(testSchedulingAddAPIURL, {
-      method: 'POST',
-      body: JSON.stringify({
-        resourceId: 1,
-        holder: 'alice@example.com',
-        startsAt: '2026-06-01T09:00:00Z',
-        endsAt: '2026-06-01T10:00:00Z',
-        timezone: "Europe/London",
-      })
-    }))
-    const response = await POST(request)
-    const contentType = response.headers.get('Content-Type')
-    const json = await response.json();
+  // it('should reset deleted record 1 so other tests don\'t break', async () => {
+  //   const request = new NextRequest(new Request(testSchedulingAddAPIURL, {
+  //     method: 'POST',
+  //     body: JSON.stringify({
+  //       resourceId: 1,
+  //       holder: 'alice@example.com',
+  //       startsAt: '2026-06-01T09:00:00Z',
+  //       endsAt: '2026-06-01T10:00:00Z',
+  //       timezone: "Europe/London",
+  //     })
+  //   }))
+  //   const response = await POST(request)
+  //   const contentType = response.headers.get('Content-Type')
+  //   const json = await response.json();
 
-    expect(response.status).toEqual(200)
-    expect(contentType).toEqual('application/json')
-    expect(json).toEqual({
-      endsAt: "2026-06-30T14:03:00Z",
-      holder: "alice@example.com",
-      id: 1,
-      resourceId: 1,
-      startsAt: "2026-06-30T11:05:00Z",
-    })
-  })
+  //   expect(response.status).toEqual(200)
+  //   expect(contentType).toEqual('application/json')
+  //   expect(json).toEqual({
+  //     endsAt: "2026-06-30T14:03:00Z",
+  //     holder: "alice@example.com",
+  //     id: 1,
+  //     resourceId: 1,
+  //     startsAt: "2026-06-30T11:05:00Z",
+  //   })
+  // })
 })

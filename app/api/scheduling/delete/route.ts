@@ -5,12 +5,11 @@ import {
   getSingleReservation,
   noBodyErrorResponse,
   noPayloadErrorResponse,
-  noTimezoneErrorResponse,
-  patchReservation,
+  deleteReservation
 } from "../handlers";
 
 export const POST = async (request: NextRequest) => {
-
+  console.log("🚀 ~ DELETE - POST ~ request:", request)
   if(!request.body || (request.body.constructor === Object && Object.keys(request.body).length === 0)) {
     return noBodyErrorResponse()
   }
@@ -21,10 +20,6 @@ export const POST = async (request: NextRequest) => {
     return noPayloadErrorResponse();
   }
 
-  if (!payload.timezone) {
-    return noTimezoneErrorResponse();
-  }
-
   // Seems to be a bug with Next API paths
   // this should be caught by `app/api/scheduling/route.ts`
   // not `app/api/scheduling/add/route.ts`
@@ -33,5 +28,5 @@ export const POST = async (request: NextRequest) => {
     return getSingleReservation(payload)
   }
 
-  return patchReservation(payload);
+  return deleteReservation(payload);
 }

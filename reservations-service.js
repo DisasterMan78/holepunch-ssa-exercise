@@ -45,6 +45,7 @@ const empty = (res, status) => {
 
 const server = http.createServer(async (req, res) => {
   try {
+    console.log('reservations-service SERVING', req.method)
     const url = new URL(req.url, 'http://localhost')
     const idMatch = url.pathname.match(/^\/(\d+)$/)
     const id = idMatch ? Number(idMatch[1]) : null
@@ -111,6 +112,8 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === 'DELETE' && id !== null) {
+      console.log("🚀 ~ req.method:", req.method)
+
       if (!db.has(id)) return void empty(res, 404)
       db.delete(id)
       return void empty(res, 204)

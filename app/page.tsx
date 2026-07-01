@@ -36,6 +36,10 @@ export type PatchReservationOptions = {
   endsAt?: string,
 };
 
+export type DeleteReservationOptions = {
+  reservationId: number,
+};
+
 type RequestOptions =
   ReservationOptions |
   ListOptions |
@@ -43,6 +47,8 @@ type RequestOptions =
   PatchReservationOptions;
 
 export type OnSubmitFn = (event: SubmitEvent<HTMLFormElement>) => void;
+
+type APIResponseType = HydratedReservationData | ApiError;
 
 
 const buildFullReservationFromFormData = (
@@ -117,6 +123,7 @@ const Home = () => {
     addReservation: 'http://localhost:3000/api/scheduling/add/',
     replaceReservation: 'http://localhost:3000/api/scheduling/replace/',
     patchReservation: 'http://localhost:3000/api/scheduling/patch/',
+    deleteReservation: 'http://localhost:3000/api/scheduling/delete/',
   }
   let apiUrl = endpoints.reservation;
 
@@ -136,7 +143,7 @@ const Home = () => {
     }
 
     switch (requestType) {
-      case 'reservation':
+      case 'single':
         resetRequestOptions();
         apiUrl = endpoints.reservation;
         (requestOptions as ReservationOptions).reservationId = form.reservationId.value;
@@ -170,6 +177,12 @@ const Home = () => {
         buildPatchReservationFromFormData(selectedReservation, form));
         apiUrl = endpoints.patchReservation;
       break;
+
+      case 'delete':
+        resetRequestOptions();
+        (requestOptions as DeleteReservationOptions).reservationId = form.reservationId.value;
+        apiUrl = endpoints.deleteReservation;
+      break;
     }
 
 
@@ -183,11 +196,14 @@ const Home = () => {
       .catch(error => {
         setError(error as ApiError);
       })
-      .then((response: HydratedReservationData | ApiError) => {
+      .then((response: APIResponseType) => {
         if (response && 'error' in response) {
           setError(response as ApiError);
         } else {
           setResponse(response as HydratedReservationData);
+        }
+        if (requestType === 'delete') {
+          fetchReservationsList();
         }
         setDataIsLoading(false);
       });
@@ -209,7 +225,8 @@ const Home = () => {
         if (response && 'error' in response) {
           setError(response as ApiError);
         } else {
-          setReservationsList(response);
+          const reservationsArray = Object.entries(response).map(entry => entry[1])
+          setReservationsList(reservationsArray);
         }
         setListIsLoading(false);
       });

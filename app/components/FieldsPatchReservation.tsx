@@ -1,7 +1,6 @@
 import type { HydratedReservationData, ResourceData } from "../api/scheduling/handlers";
-import type { PatchReservationOptions } from "../page";
 
-import { Dispatch, JSX, SetStateAction, useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { Input, Label, TextField } from "@heroui/react";
 import {
   ReservationSelector,

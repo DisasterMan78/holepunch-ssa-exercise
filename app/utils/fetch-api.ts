@@ -1,6 +1,6 @@
 import { isValidJson } from "./validation/json-validator";
 
-type Methods = 'GET' | 'POST' | 'PUT' | 'PATCH';
+type Methods = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 type FetchInit = {
   method: Methods;
@@ -30,21 +30,25 @@ export const FetchApiOnClient = async (apiURL: string, method: Methods, payload?
 
     const body = await response.text();
 
-    if (response.status !== 200 &&  response.status !== 201) {
+    if (response.status !== 200 &&  response.status !== 201 && response.status !== 204) {
       return {
         error: response.status,
         errorMessage: response.statusText,
       }
     }
 
-    if (!isValidJson(body)) {
-      return ({
-        error: 500,
-        errorMessage: 'The server responded with malformed JSON',
-      })
-    }
+    if (response.status !== 204) {
 
-    responseData = await JSON.parse(body);
+      if (!isValidJson(body)) {
+        return ({
+          error: 500,
+          errorMessage: 'The server responded with malformed JSON',
+        })
+      }
+
+      responseData = await JSON.parse(body);
+
+    }
   } catch (error) {
     return Promise.reject(error as Error);
   }

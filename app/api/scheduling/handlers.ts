@@ -202,6 +202,24 @@ export const patchReservation = async (payload: genericPayload) => {
 }
 
 
+export const deleteReservation = async (payload: genericPayload) => {
+  console.log("🚀 ~ deleteReservation ~ payload:", payload)
+  const reservationIdURL = `${reservationsAPIURL}${payload.reservationId}`;
+
+  delete payload.reservationId;
+
+  const deleteReservationResponse = await FetchApiOnClient(reservationIdURL, 'DELETE', payload);
+
+  if (deleteReservationResponse?.error) {
+    return upstreamErrorResponse(deleteReservationResponse)
+  }
+
+  return new Response(undefined, {
+    status: 204,
+  });
+}
+
+
 const errorResponseResourceId = (id) => {
   return new Response(JSON.stringify({
     name: 500,

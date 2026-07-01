@@ -12,6 +12,7 @@ import {
   ReplaceReservationInputs,
   SingleReservationInputs,
   PatchReservationInputs,
+  DeleteReservationInputs,
 } from "./fieldsets";
 
 import styles from '../page.module.css';
@@ -25,10 +26,11 @@ export type SchedulingFormProps = {
   onSubmitFn: OnSubmitFn,
 };
 
-type FormFieldSets = 'reservation' | 'list' | 'add' | 'replace' | 'patch';
+type FormFieldSets = 'single' | 'list' | 'add' | 'replace' | 'patch' | 'delete';
 
 const SchedulingForm = ({ reservationsList, fetchReservationsList, listIsLoading, onSubmitFn, selectedReservation, setSelectedReservation }: SchedulingFormProps) => {
-  const [showFields, setShowFields] = useState<FormFieldSets>('reservation');
+  const fieldSets:FormFieldSets[] = ['single', 'list', 'add', 'replace', 'patch', 'delete'];
+  const [showFields, setShowFields] = useState<FormFieldSets>('single');
   const [reservationId, setReservationId] = useState('1');
   const [resourceId, setResourceId] = useState('');
   const [paginationSize, setPaginationSize] = useState('');
@@ -42,6 +44,7 @@ const SchedulingForm = ({ reservationsList, fetchReservationsList, listIsLoading
     switch (selected) {
       case 'replace':
       case 'patch':
+      case 'delete':
         fetchReservationsList();
         break;
     }
@@ -64,61 +67,28 @@ const SchedulingForm = ({ reservationsList, fetchReservationsList, listIsLoading
       <fieldset
         className={styles.radioTabs}
       >
-        <input
-          type="radio"
-          name="apiRequestType"
-          id="api-request-reservation"
-          value="reservation"
-          onChange={(e) => showFieldOptions(e)}
-        />
-        <label htmlFor="api-request-reservation">
-          Single Reservation
-        </label>
-        <input
-          type="radio"
-          name="apiRequestType"
-          id="apiRequestList"
-          value="list"
-          onChange={(e) => showFieldOptions(e)}
-        />
-        <label htmlFor="apiRequestList">
-          List Reservations
-        </label>
-        <input
-          type="radio"
-          name="apiRequestType"
-          id="apiRequestAdd"
-          value="add"
-          onChange={(e) => showFieldOptions(e)}
-        />
-        <label htmlFor="apiRequestAdd">
-          Add Reservation
-        </label>
-        <input
-          type="radio"
-          name="apiRequestType"
-          id="apiRequestReplace"
-          value="replace"
-          onChange={(e) => showFieldOptions(e)}
-        />
-        <label htmlFor="apiRequestReplace">
-          Replace Reservation
-        </label>
-        <input
-          type="radio"
-          name="apiRequestType"
-          id="apiRequestPatch"
-          value="patch"
-          onChange={(e) => showFieldOptions(e)}
-        />
-        <label htmlFor="apiRequestPatch">
-          Patch Reservation
-        </label>
+        {fieldSets.map((set) => (
+          <span
+            key={set}
+          >
+            <input
+              type="radio"
+              name="apiRequestType"
+              id={`apiRequest${set.replace(/^./, set[0].toUpperCase())}`}
+              value={set}
+              onChange={(e) => showFieldOptions(e)}
+              checked={showFields === set}
+            />
+            <label htmlFor={`apiRequest${set.replace(/^./, set[0].toUpperCase())}`}>
+              {set.replace(/^./, set[0].toUpperCase())} Reservation
+            </label>
+          </span>
+        ))}
       </fieldset>
       <fieldset className={styles.fieldComponents}>
         {!listIsLoading && (
         <>
-          {showFields === 'reservation' && (
+          {showFields === 'single' && (
             <SingleReservationInputs
               reservationId={reservationId}
               setReservationId={setReservationId}
@@ -155,6 +125,12 @@ const SchedulingForm = ({ reservationsList, fetchReservationsList, listIsLoading
               resourceOptions={catalogResources}
               selectedReservation={selectedReservation}
               setPatchData={setReplacementData}
+            />
+          )}
+          {showFields === 'delete' && (
+            <DeleteReservationInputs
+              reservationOptions={reservationsList}
+              setDeleteData={setReplacementData}
             />
           )}
           <br />
