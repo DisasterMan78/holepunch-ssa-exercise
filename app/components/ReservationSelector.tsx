@@ -1,7 +1,6 @@
 "use client";
 
 import {FieldError, Label, ListBox, Select} from "@heroui/react";
-import { HydratedReservationData } from "../api/scheduling/handlers";
 
 export const ReservationSelector = ({ reservationOptions, setReplacementData }) => (
   <div className="flex w-[256px] flex-col gap-4">
@@ -20,14 +19,13 @@ export const ReservationSelector = ({ reservationOptions, setReplacementData }) 
       <Select.Popover>
         <ListBox>
           {
-            (Object.entries(reservationOptions) as unknown as HydratedReservationData[]).map((option) => option && (
+            (reservationOptions).map((option) => option && (
               <ListBox.Item
-                id={option[0]}
-                key={option[0]}
-                value={{id: option[0]}}
-                textValue={option[1].holder}
+                id={option.id}
+                key={option.id}
+                textValue={option.holder}
               >
-                {option[1].holder} ({option[1].resource?.name}, {new Date(option[1].localStartsAt).toDateString()})
+                {option.holder} ({option.resource?.name}, {new Date(option.localStartsAt).toDateString()})
                 <ListBox.ItemIndicator />
               </ListBox.Item>
             ))

@@ -48,8 +48,10 @@ const SchedulingForm = ({ reservationsList, fetchReservationsList, listIsLoading
 
   }
 
-  const setReplacementData = (reservationIndex: number) => {
-    reservationsList && setSelectedReservation(reservationsList[reservationIndex])
+  const setReplacementData = (selectedReservationId: number) => {
+    const reservationById = reservationsList?.find(reservation => reservation?.id === selectedReservationId);
+
+    setSelectedReservation(reservationById);
   }
 
   return (
